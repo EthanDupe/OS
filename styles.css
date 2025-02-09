@@ -11,6 +11,32 @@ body {
   background: #e0e0e0;
 }
 
+/* Themes */
+body.theme-dark {
+  background: #333;
+  color: #fff;
+}
+
+body.theme-light {
+  background: #e0e0e0;
+  color: #000;
+}
+
+body.theme-blue {
+  background: #d0e7ff;
+  color: #000;
+}
+
+body.theme-green {
+  background: #d0ffd6;
+  color: #000;
+}
+
+body.theme-red {
+  background: #ffd0d0;
+  color: #000;
+}
+
 /* Login Screen */
 #loginScreen {
   position: fixed;
@@ -19,24 +45,35 @@ body {
   width: 100%;
   height: 100%;
   background: #444;
-  color: #fff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 3000;
 }
 
-#loginScreen input {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 4px;
-  border: none;
-  width: 200px;
+.login-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
 }
 
-#loginScreen button {
-  padding: 10px 20px;
+.login-container h2 {
+  margin-bottom: 10px;
+}
+
+.login-container input {
+  width: 90%;
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-container button {
+  width: 95%;
+  padding: 10px;
   margin: 5px;
   border: none;
   border-radius: 4px;
@@ -46,11 +83,35 @@ body {
   transition: background 0.3s;
 }
 
-#loginScreen button:hover {
+.login-container button:hover {
   background: #2980b9;
 }
 
-/* Boot Up Screen */
+/* Avatar selection in login */
+.avatar-selection {
+  margin: 10px 0;
+}
+
+.avatar-options {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.avatar-option {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.3s;
+}
+
+.avatar-option:hover {
+  border: 2px solid #3498db;
+}
+
+/* Boot Screen */
 #bootScreen {
   position: fixed;
   top: 0;
@@ -58,22 +119,39 @@ body {
   width: 100%;
   height: 100%;
   background: #222;
-  color: #fff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   z-index: 2500;
+  color: #fff;
+}
+
+.boot-loading {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .loader {
+  width: 120px;
+  height: 120px;
   border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
   border-radius: 50%;
+  border-top: 8px solid #3498db;
+  animation: spin 2s linear infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.loader img {
   width: 60px;
   height: 60px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  border-radius: 50%;
+  position: absolute;
 }
 
 @keyframes spin {
@@ -81,50 +159,60 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Notification */
-#notificationContainer {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 4000;
+/* Main OS */
+#mainOS {
+  width: 100%;
+  height: 100%;
 }
 
-.notification {
-  background: #333;
-  color: #fff;
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  opacity: 0.9;
-}
-
-/* Taskbar */
+/* Taskbar / Navbar */
 #taskbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: rgba(50, 50, 50, 0.95);
-  padding: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
   z-index: 2000;
 }
 
-#taskbar #taskbarIcons button {
+#taskbarIcons button {
   background: #3498db;
   color: #fff;
   border: none;
-  padding: 10px 15px;
-  margin: 0 5px;
+  padding: 8px 12px;
+  margin: 0 3px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s;
 }
 
-#taskbar #taskbarIcons button:hover {
+#taskbarIcons button:hover {
   background: #2980b9;
-  transform: translateY(-2px);
+}
+
+#taskbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#clock {
+  font-size: 14px;
+}
+
+#welcomeMsg {
+  font-size: 14px;
+}
+
+#navAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #fff;
 }
 
 /* Minimized Windows */
@@ -148,7 +236,7 @@ body {
   background: #95a5a6;
 }
 
-/* Window Styling */
+/* Windows */
 .window {
   position: absolute;
   background: #fff;
@@ -170,7 +258,7 @@ body {
   align-items: center;
 }
 
-.window .window-controls button {
+.window-controls button {
   background: transparent;
   border: none;
   color: #fff;
@@ -180,23 +268,16 @@ body {
   transition: color 0.3s;
 }
 
-.window .window-controls button:hover {
+.window-controls button:hover {
   color: #e74c3c;
 }
 
-.window textarea,
-.window input[type="text"] {
+.window textarea, .window input[type="text"] {
   width: 95%;
   padding: 8px;
   margin: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-/* Notes App */
-#notesApp textarea {
-  height: 150px;
-  resize: none;
 }
 
 /* App Buttons */
@@ -220,21 +301,7 @@ body {
   background: #2980b9;
 }
 
-/* Calculator App */
-#calculatorApp {
-  padding: 10px;
-}
-
-#calcDisplay {
-  width: calc(100% - 20px);
-  margin: 10px;
-  padding: 10px;
-  font-size: 20px;
-  text-align: right;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
+/* Calculator Buttons */
 .calc-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -257,7 +324,7 @@ body {
   background: #27ae60;
 }
 
-/* Terminal App */
+/* Terminal */
 .terminal-output {
   background: #000;
   color: #0f0;
@@ -270,12 +337,25 @@ body {
 }
 
 /* Browser App */
-#browserApp iframe {
+.browser-controls {
+  padding: 5px;
+  display: flex;
+  gap: 5px;
+}
+
+.browser-controls input {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#iframe {
   width: 100%;
   height: 400px;
 }
 
-/* File Manager App */
+/* File Manager */
 .file-manager {
   padding: 10px;
 }
@@ -315,13 +395,13 @@ body {
   background: #f0f0f0;
 }
 
-/* Media Player App */
-#mediaPlayerApp audio {
+/* Camera App */
+#cameraApp video {
   width: 100%;
-  margin: 10px;
+  height: auto;
 }
 
-/* Settings App */
+/* Settings */
 .settings {
   padding: 10px;
 }
@@ -330,22 +410,7 @@ body {
   margin: 10px 0;
 }
 
-.settings button {
-  background: #3498db;
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 5px;
-  transition: background 0.3s;
-}
-
-.settings button:hover {
-  background: #2980b9;
-}
-
-.settings select, .settings input[type="text"] {
+.settings button, .settings select, .settings input[type="text"] {
   padding: 8px;
   margin: 5px;
   border-radius: 4px;
