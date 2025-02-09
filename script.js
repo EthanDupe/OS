@@ -1,48 +1,55 @@
-// Function to close a window by hiding it
-function closeWindow(windowId) {
-  document.getElementById(windowId).style.display = 'none';
+// Open the notes app when the "Notes" button is clicked
+document.getElementById('notesButton').addEventListener('click', function() {
+  openNotesApp();
+});
+
+// Display the notes app and load any saved note from cookies
+function openNotesApp() {
+  document.getElementById('notesApp').style.display = 'block';
+  let note = getCookie('notes');
+  if (note) {
+    document.getElementById('notesContent').value = decodeURIComponent(note);
+  }
 }
 
-// Make the window draggable
-dragElement(document.getElementById("window1"));
+// Close the notes app window
+function closeNotesApp() {
+  document.getElementById('notesApp').style.display = 'none';
+}
 
-function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  // Use the title bar as the drag handle if available
-  var titleBar = elmnt.querySelector(".title-bar");
-  if (titleBar) {
-    titleBar.onmousedown = dragMouseDown;
-  } else {
-    elmnt.onmousedown = dragMouseDown;
-  }
+// Save the note content to a cookie (expires in 7 days)
+function saveNote() {
+  let noteContent = document.getElementById('notesContent').value;
+  setCookie('notes', encodeURIComponent(noteContent), 7);
+  alert("Note saved!");
+}
 
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+// Delete the note cookie and clear the textarea
+function deleteNote() {
+  setCookie('notes', '', -1); // Set cookie expiration to past date
+  document.getElementById('notesContent').value = '';
+  alert("Note deleted!");
+}
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+// Utility function to set a cookie
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    let date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
   }
+  document.cookie = name + "=" + value + expires + "; path=/";
+}
 
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
+// Utility function to get a cookie by name
+function getCookie(name) {
+  let nameEQ = name + "=";
+  let ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
   }
+  return null;
 }
