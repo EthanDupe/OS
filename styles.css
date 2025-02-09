@@ -1,114 +1,280 @@
-/* Basic reset and styling */
-body, html {
+/* Basic reset */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f4f4;
 }
 
-/* Improved Taskbar Styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e0e0e0;
+  overflow: hidden;
+}
+
+/* Boot Up Screen */
+#bootScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Notification */
+#notificationContainer {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 3000;
+}
+
+.notification {
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  opacity: 0.9;
+}
+
+/* Taskbar */
 #taskbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(90deg, #3b5998, #8b9dc3);
-  height: 50px;
+  background: rgba(50, 50, 50, 0.95);
+  padding: 10px;
   display: flex;
-  align-items: center;
-  padding: 0 20px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  justify-content: center;
   z-index: 1000;
 }
 
-/* Improved Button Styling for the Taskbar */
 #taskbar button {
-  background: #fff;
-  color: #333;
+  background: #3498db;
+  color: #fff;
   border: none;
-  padding: 10px 20px;
-  margin-right: 15px;
+  padding: 10px 15px;
+  margin: 0 5px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: background 0.3s, transform 0.2s;
 }
 
 #taskbar button:hover {
-  background: #f2f2f2;
+  background: #2980b9;
   transform: translateY(-2px);
 }
 
-/* Window (Notes App) styling remains similar */
+/* Window Styling */
 .window {
   position: absolute;
-  top: 50px;
-  left: 50px;
-  width: 320px;
   background: #fff;
   border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-  border-radius: 4px;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.4);
+  border-radius: 6px;
   overflow: hidden;
+  width: 350px;
 }
 
-/* Title bar styling for the window */
-.title-bar {
-  background: #0078D7;
-  color: white;
-  padding: 8px 10px;
+/* Title Bar for Draggable Windows */
+.window .title-bar {
+  background: #444;
+  color: #fff;
+  padding: 8px;
+  cursor: move;
   display: flex;
   justify-content: space-between;
-  cursor: move;
+  align-items: center;
 }
 
-/* Content area styling */
-.window-content {
-  padding: 10px;
-}
-
-/* Improved Close Button Styling */
-.close-btn {
+.window .title-bar button {
   background: transparent;
-  color: white;
   border: none;
-  font-weight: bold;
-  cursor: pointer;
+  color: #fff;
   font-size: 16px;
+  cursor: pointer;
   transition: color 0.3s;
 }
 
-.close-btn:hover {
-  color: #ffcccc;
+.window .title-bar button:hover {
+  color: #e74c3c;
 }
 
-/* Styling for buttons within the notes app */
-.window-content button {
-  background: #0078D7;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  margin-right: 5px;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.window-content button:hover {
-  background: #005fa3;
-  transform: translateY(-2px);
-}
-
-/* Styling for the textarea */
-#notesContent {
+.window textarea,
+.window input[type="text"] {
   width: 100%;
-  box-sizing: border-box;
   padding: 8px;
+  margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
-  resize: vertical;
+}
+
+/* Notes App */
+#notesApp textarea {
+  height: 150px;
+  resize: none;
+}
+
+.app-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px 10px 10px;
+}
+
+.app-buttons button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.app-buttons button:hover {
+  background: #2980b9;
+}
+
+/* Calculator App */
+#calculatorApp {
+  padding: 10px;
+}
+
+#calcDisplay {
+  width: calc(100% - 20px);
+  margin: 10px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: right;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.calc-buttons button {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.calc-buttons button:hover {
+  background: #27ae60;
+}
+
+/* Terminal App */
+.terminal-output {
+  background: #000;
+  color: #0f0;
+  font-family: monospace;
+  height: 150px;
+  overflow-y: auto;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 4px;
+}
+
+/* Browser App */
+#browserApp iframe {
+  width: 100%;
+  height: 400px;
+}
+
+/* File Manager App */
+.file-manager {
+  padding: 10px;
+}
+
+.file-manager button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background 0.3s;
+}
+
+.file-manager button:hover {
+  background: #2980b9;
+}
+
+.file-manager ul {
+  list-style: none;
+  max-height: 100px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.file-manager ul li {
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.file-manager ul li:hover {
+  background: #f0f0f0;
+}
+
+/* Media Player App */
+#mediaPlayerApp audio {
+  width: 100%;
+  margin: 10px;
+}
+
+/* Settings App */
+.settings {
+  padding: 10px;
+}
+
+.settings button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  transition: background 0.3s;
+}
+
+.settings button:hover {
+  background: #2980b9;
 }
