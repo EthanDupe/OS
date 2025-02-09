@@ -210,6 +210,25 @@
       </div>
       <div id="runningApps" class="task-manager-list"></div>
     </div>
+    
+    <!-- SNAKE GAME APP -->
+<div id="snakeGame" class="window" style="display: none;">
+  <div class="title-bar">
+    <span>Snake Game</span>
+    <div class="window-controls">
+      <button onclick="minimizeWindow('snakeGame')">_</button>
+      <button onclick="maximizeWindow('snakeGame')">[ ]</button>
+      <button onclick="closeApp('snakeGame')">✕</button>
+    </div>
+  </div>
+  <div class="game-container">
+    <canvas id="snakeCanvas" width="300" height="300"></canvas>
+    <div class="game-controls">
+      <p>Score: <span id="snakeScore">0</span></p>
+      <button onclick="resetSnake()">New Game</button>
+    </div>
+  </div>
+</div>
 
     <!-- SETTINGS APP -->
     <div id="settingsApp" class="window" style="display: none;">
@@ -221,15 +240,25 @@
           <button onclick="closeApp('settingsApp')">✕</button>
         </div>
       </div>
-      <div class="settings">
-        <h3>Theme &amp; Wallpaper</h3>
-        <div class="theme-options">
-          <button onclick="setTheme('dark')">Dark Mode</button>
-          <button onclick="setTheme('light')">Light Mode</button>
-          <button onclick="setTheme('blue')">Blue Theme</button>
-          <button onclick="setTheme('green')">Green Theme</button>
-          <button onclick="setTheme('red')">Red Theme</button>
-        </div>
+      <!-- Add to Settings App -->
+<h3>Custom Theme Creator</h3>
+<div class="theme-creator">
+  <div class="color-picker">
+    <label>Primary Color: <input type="color" id="themePrimary"></label>
+    <label>Background: <input type="color" id="themeBackground"></label>
+    <label>Text Color: <input type="color" id="themeText"></label>
+  </div>
+  <div class="font-picker">
+    <label>Font Family:
+      <select id="themeFont">
+        <option value="Roboto">Roboto</option>
+        <option value="Arial">Arial</option>
+        <option value="Monospace">Monospace</option>
+      </select>
+    </label>
+  </div>
+  <button onclick="saveCustomTheme()">Save Custom Theme</button>
+</div>
         <div class="wallpaper-options">
           <p>Select Wallpaper:</p>
           <img src="https://i.pinimg.com/736x/9d/88/87/9d888780ab67efcebb2bfc512b2fde6f.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
@@ -311,21 +340,24 @@
       </div>
     </div>
 
-    <!-- CALENDAR APP -->
-    <div id="calendarApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Calendar</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('calendarApp')">_</button>
-          <button onclick="maximizeWindow('calendarApp')">[ ]</button>
-          <button onclick="closeApp('calendarApp')">✕</button>
-        </div>
-      </div>
-      <div class="app-content">
-        <p>[Calendar Display Here]</p>
-      </div>
+   <!-- Enhanced Calendar App -->
+<div id="calendarApp" class="window" style="display: none;">
+  <!-- ... existing title bar ... -->
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button onclick="changeMonth(-1)">←</button>
+      <h3 id="calendarMonth"></h3>
+      <button onclick="changeMonth(1)">→</button>
     </div>
-
+    <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="calendar-events">
+      <input type="text" id="eventInput" placeholder="New event">
+      <button onclick="addEvent()">Add Event</button>
+      <ul id="eventList"></ul>
+    </div>
+  </div>
+</div>
+    
     <!-- TO-DO APP -->
     <div id="todoApp" class="window" style="display: none;">
       <div class="title-bar">
