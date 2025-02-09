@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Import Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web OS</title>
   <link rel="stylesheet" href="styles.css" />
@@ -13,8 +15,10 @@
       <h2>Login / Register</h2>
       <input type="text" id="loginUsername" placeholder="Username">
       <input type="password" id="loginPassword" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <button onclick="registerUser()">Register</button>
+      <div class="login-buttons">
+        <button onclick="login()">Login</button>
+        <button onclick="registerUser()">Register</button>
+      </div>
     </div>
   </div>
 
@@ -63,7 +67,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('notesApp')">_</button>
           <button onclick="maximizeWindow('notesApp')">[ ]</button>
-          <button onclick="closeApp('notesApp')">X</button>
+          <button onclick="closeApp('notesApp')">✕</button>
         </div>
       </div>
       <textarea id="notesContent" placeholder="Type your note..."></textarea>
@@ -81,7 +85,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('calculatorApp')">_</button>
           <button onclick="maximizeWindow('calculatorApp')">[ ]</button>
-          <button onclick="closeApp('calculatorApp')">X</button>
+          <button onclick="closeApp('calculatorApp')">✕</button>
         </div>
       </div>
       <input type="text" id="calcDisplay" disabled>
@@ -89,15 +93,15 @@
         <button onclick="calcInput('7')">7</button>
         <button onclick="calcInput('8')">8</button>
         <button onclick="calcInput('9')">9</button>
-        <button onclick="calcInput('/')">/</button>
+        <button onclick="calcInput('/')">÷</button>
         <button onclick="calcInput('4')">4</button>
         <button onclick="calcInput('5')">5</button>
         <button onclick="calcInput('6')">6</button>
-        <button onclick="calcInput('*')">*</button>
+        <button onclick="calcInput('*')">×</button>
         <button onclick="calcInput('1')">1</button>
         <button onclick="calcInput('2')">2</button>
         <button onclick="calcInput('3')">3</button>
-        <button onclick="calcInput('-')">-</button>
+        <button onclick="calcInput('-')">−</button>
         <button onclick="calcInput('0')">0</button>
         <button onclick="calcClear()">C</button>
         <button onclick="calcCalculate()">=</button>
@@ -112,7 +116,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('terminalApp')">_</button>
           <button onclick="maximizeWindow('terminalApp')">[ ]</button>
-          <button onclick="closeApp('terminalApp')">X</button>
+          <button onclick="closeApp('terminalApp')">✕</button>
         </div>
       </div>
       <div id="terminalOutput" class="terminal-output"></div>
@@ -126,7 +130,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('browserApp')">_</button>
           <button onclick="maximizeWindow('browserApp')">[ ]</button>
-          <button onclick="closeApp('browserApp')">X</button>
+          <button onclick="closeApp('browserApp')">✕</button>
         </div>
       </div>
       <div class="browser-controls">
@@ -143,7 +147,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('fileManagerApp')">_</button>
           <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
-          <button onclick="closeApp('fileManagerApp')">X</button>
+          <button onclick="closeApp('fileManagerApp')">✕</button>
         </div>
       </div>
       <div class="file-manager">
@@ -164,7 +168,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('mediaPlayerApp')">_</button>
           <button onclick="maximizeWindow('mediaPlayerApp')">[ ]</button>
-          <button onclick="closeApp('mediaPlayerApp')">X</button>
+          <button onclick="closeApp('mediaPlayerApp')">✕</button>
         </div>
       </div>
       <div class="media-player">
@@ -184,7 +188,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('cameraApp')">_</button>
           <button onclick="maximizeWindow('cameraApp')">[ ]</button>
-          <button onclick="closeApp('cameraApp')">X</button>
+          <button onclick="closeApp('cameraApp')">✕</button>
         </div>
       </div>
       <video id="cameraFeed" autoplay playsinline></video>
@@ -201,7 +205,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('taskManagerApp')">_</button>
           <button onclick="maximizeWindow('taskManagerApp')">[ ]</button>
-          <button onclick="closeApp('taskManagerApp')">X</button>
+          <button onclick="closeApp('taskManagerApp')">✕</button>
         </div>
       </div>
       <div id="runningApps" class="task-manager-list"></div>
@@ -214,7 +218,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('settingsApp')">_</button>
           <button onclick="maximizeWindow('settingsApp')">[ ]</button>
-          <button onclick="closeApp('settingsApp')">X</button>
+          <button onclick="closeApp('settingsApp')">✕</button>
         </div>
       </div>
       <div class="settings">
@@ -248,7 +252,7 @@
           <label><input type="checkbox" onchange="toggleApp('cameraApp', this.checked)" checked> Camera</label>
           <label><input type="checkbox" onchange="toggleApp('taskManagerApp', this.checked)" checked> Task Manager</label>
           <label><input type="checkbox" onchange="toggleApp('launchApp', this.checked)" checked> Launch</label>
-          <!-- Additional apps management (see below) -->
+          <!-- Additional apps management -->
           <label><input type="checkbox" onchange="toggleApp('weatherApp', this.checked)" checked> Weather</label>
           <label><input type="checkbox" onchange="toggleApp('calendarApp', this.checked)" checked> Calendar</label>
           <label><input type="checkbox" onchange="toggleApp('todoApp', this.checked)" checked> To-Do</label>
@@ -277,7 +281,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('launchApp')">_</button>
           <button onclick="maximizeWindow('launchApp')">[ ]</button>
-          <button onclick="closeApp('launchApp')">X</button>
+          <button onclick="closeApp('launchApp')">✕</button>
         </div>
       </div>
       <div class="launch-grid">
@@ -299,7 +303,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('weatherApp')">_</button>
           <button onclick="maximizeWindow('weatherApp')">[ ]</button>
-          <button onclick="closeApp('weatherApp')">X</button>
+          <button onclick="closeApp('weatherApp')">✕</button>
         </div>
       </div>
       <div class="app-content">
@@ -314,7 +318,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('calendarApp')">_</button>
           <button onclick="maximizeWindow('calendarApp')">[ ]</button>
-          <button onclick="closeApp('calendarApp')">X</button>
+          <button onclick="closeApp('calendarApp')">✕</button>
         </div>
       </div>
       <div class="app-content">
@@ -329,7 +333,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('todoApp')">_</button>
           <button onclick="maximizeWindow('todoApp')">[ ]</button>
-          <button onclick="closeApp('todoApp')">X</button>
+          <button onclick="closeApp('todoApp')">✕</button>
         </div>
       </div>
       <div class="app-content">
@@ -346,10 +350,10 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('paintApp')">_</button>
           <button onclick="maximizeWindow('paintApp')">[ ]</button>
-          <button onclick="closeApp('paintApp')">X</button>
+          <button onclick="closeApp('paintApp')">✕</button>
         </div>
       </div>
-      <canvas id="paintCanvas" width="300" height="200" style="border:1px solid #ccc;"></canvas>
+      <canvas id="paintCanvas" width="300" height="200"></canvas>
       <div class="app-buttons">
         <button onclick="clearCanvas()">Clear</button>
       </div>
@@ -362,7 +366,7 @@
         <div class="window-controls">
           <button onclick="minimizeWindow('contactsApp')">_</button>
           <button onclick="maximizeWindow('contactsApp')">[ ]</button>
-          <button onclick="closeApp('contactsApp')">X</button>
+          <button onclick="closeApp('contactsApp')">✕</button>
         </div>
       </div>
       <div class="app-content">
