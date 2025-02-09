@@ -7,41 +7,34 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Login Screen -->
+  <!-- LOGIN SCREEN (shown if no credentials are stored) -->
   <div id="loginScreen">
     <div class="login-container">
-      <h2>Login</h2>
+      <h2>Login / Register</h2>
       <input type="text" id="loginUsername" placeholder="Username">
       <input type="password" id="loginPassword" placeholder="Password">
-      <div class="avatar-selection">
-        <p>Select an Avatar:</p>
-        <div class="avatar-options">
-          <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-          <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-          <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-          <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-        </div>
-      </div>
       <button onclick="login()">Login</button>
       <button onclick="registerUser()">Register</button>
     </div>
   </div>
 
-  <!-- Boot Screen -->
+  <!-- BOOT SCREEN -->
   <div id="bootScreen">
     <div class="boot-loading">
       <div class="loader">
+        <!-- The loader rotates the blue border; the avatar inside does not spin -->
         <img id="bootAvatar" src="" alt="Avatar">
       </div>
       <p>Booting up...</p>
     </div>
   </div>
 
-  <!-- Main OS (hidden initially) -->
+  <!-- MAIN OS (hidden until booted) -->
   <div id="mainOS" style="display: none;">
-    <!-- Taskbar / Navbar -->
+    <!-- TASKBAR / NAVBAR -->
     <div id="taskbar">
       <div id="taskbarIcons">
+        <!-- Primary apps -->
         <button onclick="openApp('notesApp')">📝 Notes</button>
         <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
         <button onclick="openApp('terminalApp')">💻 Terminal</button>
@@ -51,6 +44,7 @@
         <button onclick="openApp('cameraApp')">📷 Camera</button>
         <button onclick="openApp('settingsApp')">⚙ Settings</button>
         <button onclick="openApp('taskManagerApp')">🗂 Task Manager</button>
+        <button onclick="openApp('launchApp')">☰ Launch</button>
       </div>
       <div id="taskbarRight">
         <div id="clock"></div>
@@ -60,9 +54,9 @@
       <div id="minimizedWindows"></div>
     </div>
 
-    <!-- App Windows -->
+    <!-- APP WINDOWS -->
 
-    <!-- Notes App -->
+    <!-- NOTES APP -->
     <div id="notesApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Notes</span>
@@ -76,10 +70,11 @@
       <div class="app-buttons">
         <button onclick="saveNote()">Save</button>
         <button onclick="deleteNote()">Delete</button>
+        <button onclick="importNotes()">Import to Files</button>
       </div>
     </div>
 
-    <!-- Calculator App -->
+    <!-- CALCULATOR APP -->
     <div id="calculatorApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Calculator</span>
@@ -110,7 +105,7 @@
       </div>
     </div>
 
-    <!-- Terminal App -->
+    <!-- TERMINAL APP -->
     <div id="terminalApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Terminal</span>
@@ -124,7 +119,7 @@
       <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)">
     </div>
 
-    <!-- Web Browser App -->
+    <!-- WEB BROWSER APP -->
     <div id="browserApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Web Browser</span>
@@ -141,10 +136,10 @@
       <iframe id="browserFrame" src="https://www.bing.com" frameborder="0"></iframe>
     </div>
 
-    <!-- File Manager App -->
+    <!-- FILE MANAGER APP -->
     <div id="fileManagerApp" class="window" style="display: none;">
       <div class="title-bar">
-        <span>File Manager</span>
+        <span>File Explorer</span>
         <div class="window-controls">
           <button onclick="minimizeWindow('fileManagerApp')">_</button>
           <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
@@ -162,7 +157,7 @@
       </div>
     </div>
 
-    <!-- Media Player App -->
+    <!-- MEDIA PLAYER APP -->
     <div id="mediaPlayerApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Media Player</span>
@@ -172,13 +167,17 @@
           <button onclick="closeApp('mediaPlayerApp')">X</button>
         </div>
       </div>
-      <audio id="audioPlayer" controls>
-        <source src="sample.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
+      <div class="media-player">
+        <input type="text" id="musicURL" placeholder="Enter music URL">
+        <button onclick="loadMusic()">Load Music</button>
+        <audio id="audioPlayer" controls>
+          <source src="sample.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
     </div>
 
-    <!-- Camera App -->
+    <!-- CAMERA APP -->
     <div id="cameraApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Camera</span>
@@ -189,11 +188,13 @@
         </div>
       </div>
       <video id="cameraFeed" autoplay playsinline></video>
-      <button onclick="startCamera()">Start Camera</button>
-      <button onclick="stopCamera()">Stop Camera</button>
+      <div class="app-buttons">
+        <button onclick="startCamera()">Start Camera</button>
+        <button onclick="stopCamera()">Stop Camera</button>
+      </div>
     </div>
 
-    <!-- Task Manager App -->
+    <!-- TASK MANAGER APP -->
     <div id="taskManagerApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Task Manager</span>
@@ -203,10 +204,10 @@
           <button onclick="closeApp('taskManagerApp')">X</button>
         </div>
       </div>
-      <div id="runningApps"></div>
+      <div id="runningApps" class="task-manager-list"></div>
     </div>
 
-    <!-- Settings App -->
+    <!-- SETTINGS APP -->
     <div id="settingsApp" class="window" style="display: none;">
       <div class="title-bar">
         <span>Settings</span>
@@ -225,11 +226,12 @@
           <button onclick="setTheme('green')">Green Theme</button>
           <button onclick="setTheme('red')">Red Theme</button>
         </div>
-        <select id="wallpaperSelect" onchange="changeWallpaper(this.value)">
-          <option value="default">Default</option>
-          <option value="wallpaper1.jpg">Wallpaper 1</option>
-          <option value="wallpaper2.jpg">Wallpaper 2</option>
-        </select>
+        <div class="wallpaper-options">
+          <p>Select Wallpaper:</p>
+          <img src="https://i.pinimg.com/736x/9d/88/87/9d888780ab67efcebb2bfc512b2fde6f.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
+          <img src="https://i.pinimg.com/736x/a6/cd/08/a6cd084dfe2b336947c33ae673430273.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
+          <img src="https://i.pinimg.com/736x/9a/29/f2/9a29f273b6b954623f43a551bd5b5511.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
+        </div>
         <h3>Language</h3>
         <select id="languageSelect" onchange="setLanguage(this.value)">
           <option value="en">English</option>
@@ -245,23 +247,133 @@
           <label><input type="checkbox" onchange="toggleApp('mediaPlayerApp', this.checked)" checked> Media Player</label>
           <label><input type="checkbox" onchange="toggleApp('cameraApp', this.checked)" checked> Camera</label>
           <label><input type="checkbox" onchange="toggleApp('taskManagerApp', this.checked)" checked> Task Manager</label>
+          <label><input type="checkbox" onchange="toggleApp('launchApp', this.checked)" checked> Launch</label>
+          <!-- Additional apps management (see below) -->
+          <label><input type="checkbox" onchange="toggleApp('weatherApp', this.checked)" checked> Weather</label>
+          <label><input type="checkbox" onchange="toggleApp('calendarApp', this.checked)" checked> Calendar</label>
+          <label><input type="checkbox" onchange="toggleApp('todoApp', this.checked)" checked> To-Do</label>
+          <label><input type="checkbox" onchange="toggleApp('paintApp', this.checked)" checked> Paint</label>
+          <label><input type="checkbox" onchange="toggleApp('contactsApp', this.checked)" checked> Contacts</label>
         </div>
         <h3>User Profile</h3>
         <input type="text" id="profileName" placeholder="Display Name">
         <div class="avatar-selection">
           <p>Select Profile Picture:</p>
           <div class="avatar-options">
-            <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-            <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-            <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
-            <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+            <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
+            <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
+            <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
+            <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
           </div>
         </div>
         <button onclick="saveProfile()">Save Profile</button>
       </div>
     </div>
 
-    <!-- Notification Container -->
+    <!-- LAUNCH APP (shows extra apps not on primary nav bar) -->
+    <div id="launchApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>All Apps</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('launchApp')">_</button>
+          <button onclick="maximizeWindow('launchApp')">[ ]</button>
+          <button onclick="closeApp('launchApp')">X</button>
+        </div>
+      </div>
+      <div class="launch-grid">
+        <!-- Extra apps buttons -->
+        <button onclick="openApp('weatherApp')">☀ Weather</button>
+        <button onclick="openApp('calendarApp')">📅 Calendar</button>
+        <button onclick="openApp('todoApp')">📝 To-Do</button>
+        <button onclick="openApp('paintApp')">🎨 Paint</button>
+        <button onclick="openApp('contactsApp')">☎ Contacts</button>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL APPS -->
+
+    <!-- WEATHER APP -->
+    <div id="weatherApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Weather</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('weatherApp')">_</button>
+          <button onclick="maximizeWindow('weatherApp')">[ ]</button>
+          <button onclick="closeApp('weatherApp')">X</button>
+        </div>
+      </div>
+      <div class="app-content">
+        <p>Current Weather: Sunny, 25°C</p>
+      </div>
+    </div>
+
+    <!-- CALENDAR APP -->
+    <div id="calendarApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Calendar</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('calendarApp')">_</button>
+          <button onclick="maximizeWindow('calendarApp')">[ ]</button>
+          <button onclick="closeApp('calendarApp')">X</button>
+        </div>
+      </div>
+      <div class="app-content">
+        <p>[Calendar Display Here]</p>
+      </div>
+    </div>
+
+    <!-- TO-DO APP -->
+    <div id="todoApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>To-Do List</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('todoApp')">_</button>
+          <button onclick="maximizeWindow('todoApp')">[ ]</button>
+          <button onclick="closeApp('todoApp')">X</button>
+        </div>
+      </div>
+      <div class="app-content">
+        <input type="text" id="todoInput" placeholder="New task">
+        <button onclick="addTodo()">Add</button>
+        <ul id="todoList"></ul>
+      </div>
+    </div>
+
+    <!-- PAINT APP -->
+    <div id="paintApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Paint</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('paintApp')">_</button>
+          <button onclick="maximizeWindow('paintApp')">[ ]</button>
+          <button onclick="closeApp('paintApp')">X</button>
+        </div>
+      </div>
+      <canvas id="paintCanvas" width="300" height="200" style="border:1px solid #ccc;"></canvas>
+      <div class="app-buttons">
+        <button onclick="clearCanvas()">Clear</button>
+      </div>
+    </div>
+
+    <!-- CONTACTS APP -->
+    <div id="contactsApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Contacts</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('contactsApp')">_</button>
+          <button onclick="maximizeWindow('contactsApp')">[ ]</button>
+          <button onclick="closeApp('contactsApp')">X</button>
+        </div>
+      </div>
+      <div class="app-content">
+        <ul id="contactsList">
+          <li>John Doe - john@example.com</li>
+          <li>Jane Smith - jane@example.com</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS CONTAINER -->
     <div id="notificationContainer"></div>
   </div>
 
