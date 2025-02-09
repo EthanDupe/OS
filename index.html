@@ -6,19 +6,25 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Desktop container -->
-  <div id="desktop">
-    <!-- A simple window -->
-    <div class="window" id="window1">
-      <div class="title-bar">
-        <span>My Window</span>
-        <button class="close-btn" onclick="closeWindow('window1')">X</button>
-      </div>
-      <div class="window-content">
-        <p>Welcome to your Web OS!</p>
-      </div>
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <button id="notesButton">Notes</button>
+  </div>
+
+  <!-- Notes App Window -->
+  <div id="notesApp" class="window" style="display: none;">
+    <div class="title-bar">
+      <span>Notes App</span>
+      <button class="close-btn" onclick="closeNotesApp()">X</button>
+    </div>
+    <div class="window-content">
+      <textarea id="notesContent" rows="10" cols="30" placeholder="Type your note here..."></textarea>
+      <br>
+      <button onclick="saveNote()">Save</button>
+      <button onclick="deleteNote()">Delete</button>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
