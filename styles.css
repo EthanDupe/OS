@@ -3,31 +3,45 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f4f4;
 }
 
-/* Taskbar styling */
+/* Improved Taskbar Styling */
 #taskbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #0078D7;
-  height: 40px;
+  background: linear-gradient(90deg, #3b5998, #8b9dc3);
+  height: 50px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 20px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
+/* Improved Button Styling for the Taskbar */
 #taskbar button {
   background: #fff;
+  color: #333;
   border: none;
-  padding: 5px 10px;
-  margin-right: 5px;
+  padding: 10px 20px;
+  margin-right: 15px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
 }
 
-/* Window (Notes App) styling */
+#taskbar button:hover {
+  background: #f2f2f2;
+  transform: translateY(-2px);
+}
+
+/* Window (Notes App) styling remains similar */
 .window {
   position: absolute;
   top: 50px;
@@ -36,13 +50,15 @@ body, html {
   background: #fff;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-/* Title bar styling */
+/* Title bar styling for the window */
 .title-bar {
   background: #0078D7;
   color: white;
-  padding: 5px;
+  padding: 8px 10px;
   display: flex;
   justify-content: space-between;
   cursor: move;
@@ -53,11 +69,46 @@ body, html {
   padding: 10px;
 }
 
-/* Close button styling */
+/* Improved Close Button Styling */
 .close-btn {
-  background: red;
+  background: transparent;
   color: white;
   border: none;
+  font-weight: bold;
   cursor: pointer;
+  font-size: 16px;
+  transition: color 0.3s;
 }
 
+.close-btn:hover {
+  color: #ffcccc;
+}
+
+/* Styling for buttons within the notes app */
+.window-content button {
+  background: #0078D7;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-right: 5px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.window-content button:hover {
+  background: #005fa3;
+  transform: translateY(-2px);
+}
+
+/* Styling for the textarea */
+#notesContent {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
