@@ -198,6 +198,7 @@ body.theme-red {
   width: 360px;
   resize: both;
   transition: transform 0.2s;
+  padding-bottom: 30px;
 }
 .title-bar {
   background: var(--primary-color);
@@ -350,6 +351,38 @@ body.theme-red {
 #cameraApp video {
   width: 100%;
   height: auto;
+}
+
+/* ---------- Games (Tic Tac Toe) ---------- */
+.game-container {
+  padding: 12px;
+  text-align: center;
+}
+#ticTacToeBoard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 12px auto;
+  width: 180px;
+  height: 180px;
+}
+#ticTacToeBoard .cell {
+  background: #ecf0f1;
+  border: 1px solid #ccc;
+  font-size: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+#ticTacToeBoard .cell:hover {
+  background: #bdc3c7;
+}
+#gameStatus {
+  margin: 12px;
+  font-size: 1.2em;
 }
 
 /* ---------- Settings ---------- */
