@@ -1,4 +1,4 @@
-/* Basic reset */
+/* Basic Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,8 +7,47 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #e0e0e0;
   overflow: hidden;
+  background: #e0e0e0;
+}
+
+/* Login Screen */
+#loginScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #444;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+#loginScreen input {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 4px;
+  border: none;
+  width: 200px;
+}
+
+#loginScreen button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  background: #3498db;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#loginScreen button:hover {
+  background: #2980b9;
 }
 
 /* Boot Up Screen */
@@ -24,7 +63,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 2500;
 }
 
 .loader {
@@ -47,7 +86,7 @@ body {
   position: fixed;
   top: 10px;
   right: 10px;
-  z-index: 3000;
+  z-index: 4000;
 }
 
 .notification {
@@ -68,11 +107,11 @@ body {
   background: rgba(50, 50, 50, 0.95);
   padding: 10px;
   display: flex;
-  justify-content: center;
-  z-index: 1000;
+  justify-content: space-between;
+  z-index: 2000;
 }
 
-#taskbar button {
+#taskbar #taskbarIcons button {
   background: #3498db;
   color: #fff;
   border: none;
@@ -83,9 +122,30 @@ body {
   transition: background 0.3s, transform 0.2s;
 }
 
-#taskbar button:hover {
+#taskbar #taskbarIcons button:hover {
   background: #2980b9;
   transform: translateY(-2px);
+}
+
+/* Minimized Windows */
+#minimizedWindows {
+  display: flex;
+  align-items: center;
+}
+
+#minimizedWindows button {
+  background: #7f8c8d;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 3px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#minimizedWindows button:hover {
+  background: #95a5a6;
 }
 
 /* Window Styling */
@@ -95,12 +155,12 @@ body {
   border: 1px solid #ccc;
   box-shadow: 2px 2px 12px rgba(0,0,0,0.4);
   border-radius: 6px;
-  overflow: hidden;
+  overflow: auto;
   width: 350px;
+  resize: both;
 }
 
-/* Title Bar for Draggable Windows */
-.window .title-bar {
+.title-bar {
   background: #444;
   color: #fff;
   padding: 8px;
@@ -110,24 +170,25 @@ body {
   align-items: center;
 }
 
-.window .title-bar button {
+.window .window-controls button {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
+  margin-left: 5px;
   cursor: pointer;
   transition: color 0.3s;
 }
 
-.window .title-bar button:hover {
+.window .window-controls button:hover {
   color: #e74c3c;
 }
 
 .window textarea,
 .window input[type="text"] {
-  width: 100%;
+  width: 95%;
   padding: 8px;
-  margin: 10px 0;
+  margin: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -138,6 +199,7 @@ body {
   resize: none;
 }
 
+/* App Buttons */
 .app-buttons {
   display: flex;
   justify-content: space-between;
@@ -264,6 +326,10 @@ body {
   padding: 10px;
 }
 
+.settings h3 {
+  margin: 10px 0;
+}
+
 .settings button {
   background: #3498db;
   color: #fff;
@@ -277,4 +343,11 @@ body {
 
 .settings button:hover {
   background: #2980b9;
+}
+
+.settings select, .settings input[type="text"] {
+  padding: 8px;
+  margin: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
