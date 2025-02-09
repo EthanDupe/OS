@@ -9,191 +9,260 @@
 <body>
   <!-- Login Screen -->
   <div id="loginScreen">
-    <h2>Login</h2>
-    <input type="text" id="loginUsername" placeholder="Username">
-    <input type="password" id="loginPassword" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p>Don't have an account? <button onclick="registerUser()">Register</button></p>
+    <div class="login-container">
+      <h2>Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <div class="avatar-selection">
+        <p>Select an Avatar:</p>
+        <div class="avatar-options">
+          <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+          <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+          <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+          <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+        </div>
+      </div>
+      <button onclick="login()">Login</button>
+      <button onclick="registerUser()">Register</button>
+    </div>
   </div>
 
-  <!-- Boot Up Screen -->
+  <!-- Boot Screen -->
   <div id="bootScreen">
-    <div class="loader"></div>
-    <p>Booting up...</p>
-  </div>
-
-  <!-- Notification Container -->
-  <div id="notificationContainer"></div>
-
-  <!-- Taskbar -->
-  <div id="taskbar">
-    <div id="taskbarIcons">
-      <button onclick="openApp('notesApp')">📝 Notes</button>
-      <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
-      <button onclick="openApp('terminalApp')">💻 Terminal</button>
-      <button onclick="openApp('browserApp')">🌐 Browser</button>
-      <button onclick="openApp('fileManagerApp')">📁 File Manager</button>
-      <button onclick="openApp('mediaPlayerApp')">🎵 Media Player</button>
-      <button onclick="openApp('settingsApp')">⚙ Settings</button>
-    </div>
-    <div id="minimizedWindows"></div>
-  </div>
-
-  <!-- Notes App -->
-  <div id="notesApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Notes</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('notesApp')">_</button>
-        <button onclick="maximizeWindow('notesApp')">[ ]</button>
-        <button onclick="closeApp('notesApp')">X</button>
+    <div class="boot-loading">
+      <div class="loader">
+        <img id="bootAvatar" src="" alt="Avatar">
       </div>
-    </div>
-    <textarea id="notesContent" placeholder="Type your note..."></textarea>
-    <div class="app-buttons">
-      <button onclick="saveNote()">Save</button>
-      <button onclick="deleteNote()">Delete</button>
+      <p>Booting up...</p>
     </div>
   </div>
 
-  <!-- Calculator App -->
-  <div id="calculatorApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Calculator</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('calculatorApp')">_</button>
-        <button onclick="maximizeWindow('calculatorApp')">[ ]</button>
-        <button onclick="closeApp('calculatorApp')">X</button>
+  <!-- Main OS (hidden initially) -->
+  <div id="mainOS" style="display: none;">
+    <!-- Taskbar / Navbar -->
+    <div id="taskbar">
+      <div id="taskbarIcons">
+        <button onclick="openApp('notesApp')">📝 Notes</button>
+        <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
+        <button onclick="openApp('terminalApp')">💻 Terminal</button>
+        <button onclick="openApp('browserApp')">🌐 Browser</button>
+        <button onclick="openApp('fileManagerApp')">📁 Files</button>
+        <button onclick="openApp('mediaPlayerApp')">🎵 Music</button>
+        <button onclick="openApp('cameraApp')">📷 Camera</button>
+        <button onclick="openApp('settingsApp')">⚙ Settings</button>
+        <button onclick="openApp('taskManagerApp')">🗂 Task Manager</button>
       </div>
+      <div id="taskbarRight">
+        <div id="clock"></div>
+        <div id="welcomeMsg"></div>
+        <img id="navAvatar" src="" alt="Avatar">
+      </div>
+      <div id="minimizedWindows"></div>
     </div>
-    <input type="text" id="calcDisplay" disabled>
-    <div class="calc-buttons">
-      <button onclick="calcInput('7')">7</button>
-      <button onclick="calcInput('8')">8</button>
-      <button onclick="calcInput('9')">9</button>
-      <button onclick="calcInput('/')">/</button>
-      <button onclick="calcInput('4')">4</button>
-      <button onclick="calcInput('5')">5</button>
-      <button onclick="calcInput('6')">6</button>
-      <button onclick="calcInput('*')">*</button>
-      <button onclick="calcInput('1')">1</button>
-      <button onclick="calcInput('2')">2</button>
-      <button onclick="calcInput('3')">3</button>
-      <button onclick="calcInput('-')">-</button>
-      <button onclick="calcInput('0')">0</button>
-      <button onclick="calcClear()">C</button>
-      <button onclick="calcCalculate()">=</button>
-      <button onclick="calcInput('+')">+</button>
-    </div>
-  </div>
 
-  <!-- Terminal App -->
-  <div id="terminalApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Terminal</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('terminalApp')">_</button>
-        <button onclick="maximizeWindow('terminalApp')">[ ]</button>
-        <button onclick="closeApp('terminalApp')">X</button>
-      </div>
-    </div>
-    <div id="terminalOutput" class="terminal-output"></div>
-    <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)">
-  </div>
+    <!-- App Windows -->
 
-  <!-- Web Browser App -->
-  <div id="browserApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Web Browser</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('browserApp')">_</button>
-        <button onclick="maximizeWindow('browserApp')">[ ]</button>
-        <button onclick="closeApp('browserApp')">X</button>
+    <!-- Notes App -->
+    <div id="notesApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Notes</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('notesApp')">_</button>
+          <button onclick="maximizeWindow('notesApp')">[ ]</button>
+          <button onclick="closeApp('notesApp')">X</button>
+        </div>
       </div>
-    </div>
-    <iframe src="https://www.google.com" frameborder="0"></iframe>
-  </div>
-
-  <!-- File Manager App -->
-  <div id="fileManagerApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>File Manager</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('fileManagerApp')">_</button>
-        <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
-        <button onclick="closeApp('fileManagerApp')">X</button>
-      </div>
-    </div>
-    <div class="file-manager">
-      <button onclick="createNewFile()">New File</button>
-      <ul id="fileList"></ul>
-      <textarea id="fileContent" placeholder="File content..."></textarea>
+      <textarea id="notesContent" placeholder="Type your note..."></textarea>
       <div class="app-buttons">
-        <button onclick="saveFile()">Save File</button>
-        <button onclick="deleteFile()">Delete File</button>
+        <button onclick="saveNote()">Save</button>
+        <button onclick="deleteNote()">Delete</button>
       </div>
     </div>
-  </div>
 
-  <!-- Media Player App -->
-  <div id="mediaPlayerApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Media Player</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('mediaPlayerApp')">_</button>
-        <button onclick="maximizeWindow('mediaPlayerApp')">[ ]</button>
-        <button onclick="closeApp('mediaPlayerApp')">X</button>
+    <!-- Calculator App -->
+    <div id="calculatorApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Calculator</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('calculatorApp')">_</button>
+          <button onclick="maximizeWindow('calculatorApp')">[ ]</button>
+          <button onclick="closeApp('calculatorApp')">X</button>
+        </div>
+      </div>
+      <input type="text" id="calcDisplay" disabled>
+      <div class="calc-buttons">
+        <button onclick="calcInput('7')">7</button>
+        <button onclick="calcInput('8')">8</button>
+        <button onclick="calcInput('9')">9</button>
+        <button onclick="calcInput('/')">/</button>
+        <button onclick="calcInput('4')">4</button>
+        <button onclick="calcInput('5')">5</button>
+        <button onclick="calcInput('6')">6</button>
+        <button onclick="calcInput('*')">*</button>
+        <button onclick="calcInput('1')">1</button>
+        <button onclick="calcInput('2')">2</button>
+        <button onclick="calcInput('3')">3</button>
+        <button onclick="calcInput('-')">-</button>
+        <button onclick="calcInput('0')">0</button>
+        <button onclick="calcClear()">C</button>
+        <button onclick="calcCalculate()">=</button>
+        <button onclick="calcInput('+')">+</button>
       </div>
     </div>
-    <audio id="audioPlayer" controls>
-      <source src="sample.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
 
-  <!-- Settings App -->
-  <div id="settingsApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Settings</span>
-      <div class="window-controls">
-        <button onclick="minimizeWindow('settingsApp')">_</button>
-        <button onclick="maximizeWindow('settingsApp')">[ ]</button>
-        <button onclick="closeApp('settingsApp')">X</button>
+    <!-- Terminal App -->
+    <div id="terminalApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Terminal</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('terminalApp')">_</button>
+          <button onclick="maximizeWindow('terminalApp')">[ ]</button>
+          <button onclick="closeApp('terminalApp')">X</button>
+        </div>
+      </div>
+      <div id="terminalOutput" class="terminal-output"></div>
+      <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)">
+    </div>
+
+    <!-- Web Browser App -->
+    <div id="browserApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Web Browser</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('browserApp')">_</button>
+          <button onclick="maximizeWindow('browserApp')">[ ]</button>
+          <button onclick="closeApp('browserApp')">X</button>
+        </div>
+      </div>
+      <div class="browser-controls">
+        <input type="text" id="browserURL" placeholder="Enter URL">
+        <button onclick="loadURL()">Go</button>
+      </div>
+      <iframe id="browserFrame" src="https://www.bing.com" frameborder="0"></iframe>
+    </div>
+
+    <!-- File Manager App -->
+    <div id="fileManagerApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>File Manager</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('fileManagerApp')">_</button>
+          <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
+          <button onclick="closeApp('fileManagerApp')">X</button>
+        </div>
+      </div>
+      <div class="file-manager">
+        <button onclick="createNewFile()">New File</button>
+        <ul id="fileList"></ul>
+        <textarea id="fileContent" placeholder="File content..."></textarea>
+        <div class="app-buttons">
+          <button onclick="saveFile()">Save File</button>
+          <button onclick="deleteFile()">Delete File</button>
+        </div>
       </div>
     </div>
-    <div class="settings">
-      <h3>Theme &amp; Wallpaper</h3>
-      <button onclick="setTheme('dark')">Dark Mode</button>
-      <button onclick="setTheme('light')">Light Mode</button>
-      <select id="wallpaperSelect" onchange="changeWallpaper(this.value)">
-        <option value="default">Default</option>
-        <option value="wallpaper1.jpg">Wallpaper 1</option>
-        <option value="wallpaper2.jpg">Wallpaper 2</option>
-      </select>
-      <h3>Language</h3>
-      <select id="languageSelect" onchange="setLanguage(this.value)">
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <!-- More languages as needed -->
-      </select>
-      <h3>App Management</h3>
-      <div id="appManagement">
-        <label><input type="checkbox" onchange="toggleApp('notesApp', this.checked)" checked> Notes</label>
-        <label><input type="checkbox" onchange="toggleApp('calculatorApp', this.checked)" checked> Calculator</label>
-        <label><input type="checkbox" onchange="toggleApp('terminalApp', this.checked)" checked> Terminal</label>
-        <label><input type="checkbox" onchange="toggleApp('browserApp', this.checked)" checked> Browser</label>
-        <label><input type="checkbox" onchange="toggleApp('fileManagerApp', this.checked)" checked> File Manager</label>
-        <label><input type="checkbox" onchange="toggleApp('mediaPlayerApp', this.checked)" checked> Media Player</label>
+
+    <!-- Media Player App -->
+    <div id="mediaPlayerApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Media Player</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('mediaPlayerApp')">_</button>
+          <button onclick="maximizeWindow('mediaPlayerApp')">[ ]</button>
+          <button onclick="closeApp('mediaPlayerApp')">X</button>
+        </div>
       </div>
-      <h3>User Profile</h3>
-      <input type="text" id="profileName" placeholder="Display Name">
-      <select id="avatarSelect" onchange="changeAvatar(this.value)">
-        <option value="avatar1.png">Avatar 1</option>
-        <option value="avatar2.png">Avatar 2</option>
-        <!-- More avatars as needed -->
-      </select>
-      <button onclick="saveProfile()">Save Profile</button>
+      <audio id="audioPlayer" controls>
+        <source src="sample.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
     </div>
+
+    <!-- Camera App -->
+    <div id="cameraApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Camera</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('cameraApp')">_</button>
+          <button onclick="maximizeWindow('cameraApp')">[ ]</button>
+          <button onclick="closeApp('cameraApp')">X</button>
+        </div>
+      </div>
+      <video id="cameraFeed" autoplay playsinline></video>
+      <button onclick="startCamera()">Start Camera</button>
+      <button onclick="stopCamera()">Stop Camera</button>
+    </div>
+
+    <!-- Task Manager App -->
+    <div id="taskManagerApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Task Manager</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('taskManagerApp')">_</button>
+          <button onclick="maximizeWindow('taskManagerApp')">[ ]</button>
+          <button onclick="closeApp('taskManagerApp')">X</button>
+        </div>
+      </div>
+      <div id="runningApps"></div>
+    </div>
+
+    <!-- Settings App -->
+    <div id="settingsApp" class="window" style="display: none;">
+      <div class="title-bar">
+        <span>Settings</span>
+        <div class="window-controls">
+          <button onclick="minimizeWindow('settingsApp')">_</button>
+          <button onclick="maximizeWindow('settingsApp')">[ ]</button>
+          <button onclick="closeApp('settingsApp')">X</button>
+        </div>
+      </div>
+      <div class="settings">
+        <h3>Theme &amp; Wallpaper</h3>
+        <div class="theme-options">
+          <button onclick="setTheme('dark')">Dark Mode</button>
+          <button onclick="setTheme('light')">Light Mode</button>
+          <button onclick="setTheme('blue')">Blue Theme</button>
+          <button onclick="setTheme('green')">Green Theme</button>
+          <button onclick="setTheme('red')">Red Theme</button>
+        </div>
+        <select id="wallpaperSelect" onchange="changeWallpaper(this.value)">
+          <option value="default">Default</option>
+          <option value="wallpaper1.jpg">Wallpaper 1</option>
+          <option value="wallpaper2.jpg">Wallpaper 2</option>
+        </select>
+        <h3>Language</h3>
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+        <h3>App Management</h3>
+        <div id="appManagement">
+          <label><input type="checkbox" onchange="toggleApp('notesApp', this.checked)" checked> Notes</label>
+          <label><input type="checkbox" onchange="toggleApp('calculatorApp', this.checked)" checked> Calculator</label>
+          <label><input type="checkbox" onchange="toggleApp('terminalApp', this.checked)" checked> Terminal</label>
+          <label><input type="checkbox" onchange="toggleApp('browserApp', this.checked)" checked> Browser</label>
+          <label><input type="checkbox" onchange="toggleApp('fileManagerApp', this.checked)" checked> File Manager</label>
+          <label><input type="checkbox" onchange="toggleApp('mediaPlayerApp', this.checked)" checked> Media Player</label>
+          <label><input type="checkbox" onchange="toggleApp('cameraApp', this.checked)" checked> Camera</label>
+          <label><input type="checkbox" onchange="toggleApp('taskManagerApp', this.checked)" checked> Task Manager</label>
+        </div>
+        <h3>User Profile</h3>
+        <input type="text" id="profileName" placeholder="Display Name">
+        <div class="avatar-selection">
+          <p>Select Profile Picture:</p>
+          <div class="avatar-options">
+            <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+            <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+            <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+            <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatar(this.src)">
+          </div>
+        </div>
+        <button onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
   </div>
 
   <script src="script.js"></script>
