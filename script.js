@@ -1,72 +1,29 @@
 document.addEventListener("DOMContentLoaded", function() {
-  // If no username/password cookies exist, show login screen
-  if (!getCookie("username") || !getCookie("password")) {
+  // Check for login credentials in localStorage
+  if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
     document.getElementById("loginScreen").style.display = "flex";
   } else {
     startOS();
   }
+  // Initialize draggable windows
+  initDraggableWindows();
+  // Start clock update
+  updateClock();
+  setInterval(updateClock, 1000);
+  // Load user profile (nav avatar, welcome message)
+  loadUserProfile();
+  // Load files for file manager
+  loadFiles();
+});
 
-  // Initialize draggable windows for all .window elements
+function initDraggableWindows() {
   const windows = document.querySelectorAll(".window");
   windows.forEach(win => {
     dragElement(win);
   });
-
-  // Load theme, wallpaper, language, and file manager data
-  let theme = getCookie("theme");
-  if (theme) {
-    applyTheme(theme);
-  }
-  let wallpaper = getCookie("wallpaper");
-  if (wallpaper && wallpaper !== "default") {
-    document.body.style.backgroundImage = `url('${wallpaper}')`;
-  }
-  let language = getCookie("language");
-  if (language) {
-    console.log("Language set to:", language);
-  }
-  loadFiles();
-});
-
-// ----- OS Start / Boot Functions -----
-function startOS() {
-  // Hide login screen and show boot screen
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("bootScreen").style.display = "flex";
-  setTimeout(() => {
-    document.getElementById("bootScreen").style.display = "none";
-  }, 2000);
 }
 
-// ----- Login & Registration -----
-function login() {
-  const username = document.getElementById("loginUsername").value;
-  const password = document.getElementById("loginPassword").value;
-  let storedUsername = getCookie("username");
-  let storedPassword = getCookie("password");
-  if (!storedUsername || !storedPassword) {
-    showNotification("No user registered. Please register.");
-  } else if (username === storedUsername && password === storedPassword) {
-    showNotification("Login successful!");
-    startOS();
-  } else {
-    showNotification("Invalid credentials!");
-  }
-}
-
-function registerUser() {
-  const username = document.getElementById("loginUsername").value;
-  const password = document.getElementById("loginPassword").value;
-  if (username && password) {
-    setCookie("username", username, 30);
-    setCookie("password", password, 30);
-    showNotification("Registration successful! Please login.");
-  } else {
-    showNotification("Please enter a username and password.");
-  }
-}
-
-// ----- Draggable Window Functionality -----
+// ----- DRAGGABLE WINDOW FUNCTIONALITY -----
 function dragElement(elmnt) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   const titleBar = elmnt.querySelector(".title-bar");
@@ -100,7 +57,79 @@ function dragElement(elmnt) {
   }
 }
 
-// ----- Window Management Functions -----
+// ----- CLOCK -----
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleTimeString();
+}
+
+// ----- LOGIN / REGISTRATION & PROFILE -----
+function selectAvatar(src) {
+  // Save selected avatar (temporary until registration or profile change)
+  localStorage.setItem("selectedAvatar", src);
+}
+
+function login() {
+  const username = document.getElementById("loginUsername").value;
+  const password = document.getElementById("loginPassword").value;
+  const storedUsername = localStorage.getItem("username");
+  const storedPassword = localStorage.getItem("password");
+  if (!storedUsername || !storedPassword) {
+    showNotification("No user registered. Please register.");
+  } else if (username === storedUsername && password === storedPassword) {
+    showNotification("Login successful!");
+    startOS();
+  } else {
+    showNotification("Invalid credentials!");
+  }
+}
+
+function registerUser() {
+  const username = document.getElementById("loginUsername").value;
+  const password = document.getElementById("loginPassword").value;
+  if (username && password) {
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+    // Save selected avatar or use default
+    const avatar = localStorage.getItem("selectedAvatar") || "https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg";
+    localStorage.setItem("avatar", avatar);
+    localStorage.setItem("profileName", username);
+    showNotification("Registration successful! Please login.");
+  } else {
+    showNotification("Please enter a username and password.");
+  }
+}
+
+function loadUserProfile() {
+  const username = localStorage.getItem("profileName") || localStorage.getItem("username") || "";
+  document.getElementById("welcomeMsg").textContent = "Welcome, " + username;
+  const avatar = localStorage.getItem("avatar") || "https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg";
+  document.getElementById("navAvatar").src = avatar;
+  document.getElementById("bootAvatar").src = avatar;
+}
+
+function saveProfile() {
+  const profileName = document.getElementById("profileName").value;
+  if (profileName) {
+    localStorage.setItem("profileName", profileName);
+    loadUserProfile();
+    showNotification("Profile saved!");
+  } else {
+    showNotification("Please enter a display name.");
+  }
+}
+
+// ----- BOOT / START OS -----
+function startOS() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("bootScreen").style.display = "flex";
+  setTimeout(() => {
+    document.getElementById("bootScreen").style.display = "none";
+    document.getElementById("mainOS").style.display = "block";
+  }, 2000);
+}
+
+// ----- WINDOW MANAGEMENT -----
 function openApp(id) {
   document.getElementById(id).style.display = "block";
 }
@@ -138,7 +167,7 @@ function maximizeWindow(id) {
   }
 }
 
-// ----- Notifications -----
+// ----- NOTIFICATIONS -----
 function showNotification(message) {
   const container = document.getElementById("notificationContainer");
   const notif = document.createElement("div");
@@ -150,104 +179,31 @@ function showNotification(message) {
   }, 3000);
 }
 
-// ----- Cookie Utility Functions -----
-function setCookie(name, value, days) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + days*24*60*60*1000);
-    expires = "; expires=" + date.toUTCString();
-  }
-  document.cookie = name + "=" + value + expires + "; path=/";
-}
-
-function getCookie(name) {
-  const cname = name + "=";
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const ca = decodedCookie.split(";");
-  for (let c of ca) {
-    c = c.trim();
-    if (c.indexOf(cname) === 0) {
-      return c.substring(cname.length, c.length);
-    }
-  }
-  return "";
-}
-
-// ----- Notes App Functions -----
-function saveNote() {
-  const note = document.getElementById("notesContent").value;
-  setCookie("note", encodeURIComponent(note), 7);
-  showNotification("Note saved!");
-}
-
-function deleteNote() {
-  setCookie("note", "", -1);
-  document.getElementById("notesContent").value = "";
-  showNotification("Note deleted!");
-}
-
-// ----- Calculator Functions -----
-function calcInput(val) {
-  document.getElementById("calcDisplay").value += val;
-}
-
-function calcClear() {
-  document.getElementById("calcDisplay").value = "";
-}
-
-function calcCalculate() {
-  try {
-    const result = eval(document.getElementById("calcDisplay").value);
-    document.getElementById("calcDisplay").value = result;
-  } catch (e) {
-    document.getElementById("calcDisplay").value = "Error";
-  }
-}
-
-// ----- Terminal Functions -----
-function terminalEnter(event) {
-  if (event.key === "Enter") {
-    const input = event.target.value;
-    const output = document.getElementById("terminalOutput");
-    const newLine = document.createElement("div");
-    newLine.textContent = "> " + input;
-    output.appendChild(newLine);
-    event.target.value = "";
-    output.scrollTop = output.scrollHeight;
-  }
-}
-
-// ----- Settings & Customization Functions -----
+// ----- THEME & WALLPAPER -----
 function setTheme(theme) {
-  setCookie("theme", theme, 30);
+  localStorage.setItem("theme", theme);
   applyTheme(theme);
   showNotification("Theme set to " + theme);
 }
 
 function applyTheme(theme) {
-  if (theme === "dark") {
-    document.body.style.background = "#333";
-    document.body.style.color = "#fff";
-  } else {
-    document.body.style.background = "#e0e0e0";
-    document.body.style.color = "#000";
-  }
+  document.body.className = ""; // reset classes
+  document.body.classList.add("theme-" + theme);
 }
 
 function changeWallpaper(wallpaper) {
   if (wallpaper === "default") {
     document.body.style.backgroundImage = "";
-    setCookie("wallpaper", "default", 30);
+    localStorage.setItem("wallpaper", "default");
   } else {
     document.body.style.backgroundImage = "url('" + wallpaper + "')";
-    setCookie("wallpaper", wallpaper, 30);
+    localStorage.setItem("wallpaper", wallpaper);
   }
   showNotification("Wallpaper changed!");
 }
 
 function setLanguage(language) {
-  setCookie("language", language, 30);
+  localStorage.setItem("language", language);
   showNotification("Language set to " + language);
 }
 
@@ -259,23 +215,12 @@ function toggleApp(appId, enabled) {
   }
 }
 
-function changeAvatar(avatar) {
-  setCookie("avatar", avatar, 30);
-  showNotification("Avatar changed!");
-}
-
-function saveProfile() {
-  const profileName = document.getElementById("profileName").value;
-  setCookie("profileName", profileName, 30);
-  showNotification("Profile saved!");
-}
-
-// ----- File Manager Functions -----
+// ----- FILE MANAGER -----
 let files = [];
 let currentFileIndex = -1;
 
 function loadFiles() {
-  const fileData = getCookie("files");
+  const fileData = localStorage.getItem("files");
   if (fileData) {
     try {
       files = JSON.parse(fileData);
@@ -338,5 +283,87 @@ function deleteFile() {
 }
 
 function saveFiles() {
-  setCookie("files", JSON.stringify(files), 7);
+  localStorage.setItem("files", JSON.stringify(files));
 }
+
+// ----- CALCULATOR -----
+function calcInput(val) {
+  document.getElementById("calcDisplay").value += val;
+}
+
+function calcClear() {
+  document.getElementById("calcDisplay").value = "";
+}
+
+function calcCalculate() {
+  try {
+    const result = eval(document.getElementById("calcDisplay").value);
+    document.getElementById("calcDisplay").value = result;
+  } catch (e) {
+    document.getElementById("calcDisplay").value = "Error";
+  }
+}
+
+// ----- TERMINAL -----
+function terminalEnter(event) {
+  if (event.key === "Enter") {
+    const input = event.target.value;
+    const output = document.getElementById("terminalOutput");
+    const newLine = document.createElement("div");
+    newLine.textContent = "> " + input;
+    output.appendChild(newLine);
+    event.target.value = "";
+    output.scrollTop = output.scrollHeight;
+  }
+}
+
+// ----- WEB BROWSER -----
+function loadURL() {
+  const url = document.getElementById("browserURL").value;
+  const frame = document.getElementById("browserFrame");
+  if (url) {
+    frame.src = url;
+  }
+}
+
+// ----- CAMERA APP -----
+let cameraStream;
+function startCamera() {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        cameraStream = stream;
+        const video = document.getElementById("cameraFeed");
+        video.srcObject = stream;
+        video.play();
+      })
+      .catch(function(err) {
+        showNotification("Error accessing camera: " + err);
+      });
+  } else {
+    showNotification("Camera not supported.");
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+}
+
+// ----- TASK MANAGER -----
+function updateTaskManager() {
+  const runningApps = document.getElementById("runningApps");
+  runningApps.innerHTML = "";
+  const openWindows = document.querySelectorAll(".window");
+  openWindows.forEach(win => {
+    if (win.style.display !== "none") {
+      const appName = win.id;
+      const div = document.createElement("div");
+      div.textContent = appName;
+      runningApps.appendChild(div);
+    }
+  });
+}
+setInterval(updateTaskManager, 5000);
