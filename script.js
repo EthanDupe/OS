@@ -1,55 +1,89 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Boot up sequence: hide boot screen after 2 seconds
-  setTimeout(() => {
-    document.getElementById("bootScreen").style.display = "none";
-  }, 2000);
+document.addEventListener("DOMContentLoaded", function() {
+  // If no username/password cookies exist, show login screen
+  if (!getCookie("username") || !getCookie("password")) {
+    document.getElementById("loginScreen").style.display = "flex";
+  } else {
+    startOS();
+  }
 
-  // Initialize draggable for each window
+  // Initialize draggable windows for all .window elements
   const windows = document.querySelectorAll(".window");
-  windows.forEach((win) => {
+  windows.forEach(win => {
     dragElement(win);
   });
 
-  // Load settings (theme) from cookies
+  // Load theme, wallpaper, language, and file manager data
   let theme = getCookie("theme");
   if (theme) {
     applyTheme(theme);
   }
-
-  // Load note content from cookie if exists
-  let note = getCookie("note");
-  if (note) {
-    document.getElementById("notesContent").value = decodeURIComponent(note);
+  let wallpaper = getCookie("wallpaper");
+  if (wallpaper && wallpaper !== "default") {
+    document.body.style.backgroundImage = `url('${wallpaper}')`;
   }
-
-  // Load file manager data from cookie (files)
+  let language = getCookie("language");
+  if (language) {
+    console.log("Language set to:", language);
+  }
   loadFiles();
 });
 
-// Draggable windows function
+// ----- OS Start / Boot Functions -----
+function startOS() {
+  // Hide login screen and show boot screen
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("bootScreen").style.display = "flex";
+  setTimeout(() => {
+    document.getElementById("bootScreen").style.display = "none";
+  }, 2000);
+}
+
+// ----- Login & Registration -----
+function login() {
+  const username = document.getElementById("loginUsername").value;
+  const password = document.getElementById("loginPassword").value;
+  let storedUsername = getCookie("username");
+  let storedPassword = getCookie("password");
+  if (!storedUsername || !storedPassword) {
+    showNotification("No user registered. Please register.");
+  } else if (username === storedUsername && password === storedPassword) {
+    showNotification("Login successful!");
+    startOS();
+  } else {
+    showNotification("Invalid credentials!");
+  }
+}
+
+function registerUser() {
+  const username = document.getElementById("loginUsername").value;
+  const password = document.getElementById("loginPassword").value;
+  if (username && password) {
+    setCookie("username", username, 30);
+    setCookie("password", password, 30);
+    showNotification("Registration successful! Please login.");
+  } else {
+    showNotification("Please enter a username and password.");
+  }
+}
+
+// ----- Draggable Window Functionality -----
 function dragElement(elmnt) {
-  let pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   const titleBar = elmnt.querySelector(".title-bar");
   if (titleBar) {
     titleBar.onmousedown = dragMouseDown;
   } else {
     elmnt.onmousedown = dragMouseDown;
   }
-
   function dragMouseDown(e) {
     e = e || window.event;
     e.preventDefault();
-    // Bring window to front
-    elmnt.style.zIndex = parseInt(Date.now() / 1000);
+    elmnt.style.zIndex = Date.now();
     pos3 = e.clientX;
     pos4 = e.clientY;
     document.onmouseup = closeDragElement;
     document.onmousemove = elementDrag;
   }
-
   function elementDrag(e) {
     e = e || window.event;
     e.preventDefault();
@@ -57,17 +91,16 @@ function dragElement(elmnt) {
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
-
   function closeDragElement() {
     document.onmouseup = null;
     document.onmousemove = null;
   }
 }
 
-// Open and Close App windows
+// ----- Window Management Functions -----
 function openApp(id) {
   document.getElementById(id).style.display = "block";
 }
@@ -76,7 +109,36 @@ function closeApp(id) {
   document.getElementById(id).style.display = "none";
 }
 
-// Notification function (shows for 3 seconds)
+function minimizeWindow(id) {
+  const win = document.getElementById(id);
+  win.style.display = "none";
+  const minimizedWindows = document.getElementById("minimizedWindows");
+  const btn = document.createElement("button");
+  btn.textContent = id;
+  btn.id = "min_" + id;
+  btn.onclick = function() {
+    win.style.display = "block";
+    btn.remove();
+  };
+  minimizedWindows.appendChild(btn);
+}
+
+function maximizeWindow(id) {
+  const win = document.getElementById(id);
+  if (!win.classList.contains("maximized")) {
+    win.dataset.originalStyle = win.style.cssText;
+    win.style.top = "0";
+    win.style.left = "0";
+    win.style.width = "100%";
+    win.style.height = "100%";
+    win.classList.add("maximized");
+  } else {
+    win.style.cssText = win.dataset.originalStyle;
+    win.classList.remove("maximized");
+  }
+}
+
+// ----- Notifications -----
 function showNotification(message) {
   const container = document.getElementById("notificationContainer");
   const notif = document.createElement("div");
@@ -88,12 +150,12 @@ function showNotification(message) {
   }, 3000);
 }
 
-// Cookie utility functions
+// ----- Cookie Utility Functions -----
 function setCookie(name, value, days) {
   let expires = "";
   if (days) {
     const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    date.setTime(date.getTime() + days*24*60*60*1000);
     expires = "; expires=" + date.toUTCString();
   }
   document.cookie = name + "=" + value + expires + "; path=/";
@@ -103,16 +165,16 @@ function getCookie(name) {
   const cname = name + "=";
   const decodedCookie = decodeURIComponent(document.cookie);
   const ca = decodedCookie.split(";");
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i].trim();
-    if (c.indexOf(cname) == 0) {
+  for (let c of ca) {
+    c = c.trim();
+    if (c.indexOf(cname) === 0) {
       return c.substring(cname.length, c.length);
     }
   }
   return "";
 }
 
-// Notes functions
+// ----- Notes App Functions -----
 function saveNote() {
   const note = document.getElementById("notesContent").value;
   setCookie("note", encodeURIComponent(note), 7);
@@ -125,7 +187,7 @@ function deleteNote() {
   showNotification("Note deleted!");
 }
 
-// Calculator functions
+// ----- Calculator Functions -----
 function calcInput(val) {
   document.getElementById("calcDisplay").value += val;
 }
@@ -143,7 +205,7 @@ function calcCalculate() {
   }
 }
 
-// Terminal function
+// ----- Terminal Functions -----
 function terminalEnter(event) {
   if (event.key === "Enter") {
     const input = event.target.value;
@@ -156,10 +218,11 @@ function terminalEnter(event) {
   }
 }
 
-// Settings: Theme functions
+// ----- Settings & Customization Functions -----
 function setTheme(theme) {
   setCookie("theme", theme, 30);
   applyTheme(theme);
+  showNotification("Theme set to " + theme);
 }
 
 function applyTheme(theme) {
@@ -172,7 +235,42 @@ function applyTheme(theme) {
   }
 }
 
-// File Manager functions
+function changeWallpaper(wallpaper) {
+  if (wallpaper === "default") {
+    document.body.style.backgroundImage = "";
+    setCookie("wallpaper", "default", 30);
+  } else {
+    document.body.style.backgroundImage = "url('" + wallpaper + "')";
+    setCookie("wallpaper", wallpaper, 30);
+  }
+  showNotification("Wallpaper changed!");
+}
+
+function setLanguage(language) {
+  setCookie("language", language, 30);
+  showNotification("Language set to " + language);
+}
+
+function toggleApp(appId, enabled) {
+  const taskbarIcons = document.getElementById("taskbarIcons");
+  const btn = taskbarIcons.querySelector("button[onclick*='" + appId + "']");
+  if (btn) {
+    btn.style.display = enabled ? "inline-block" : "none";
+  }
+}
+
+function changeAvatar(avatar) {
+  setCookie("avatar", avatar, 30);
+  showNotification("Avatar changed!");
+}
+
+function saveProfile() {
+  const profileName = document.getElementById("profileName").value;
+  setCookie("profileName", profileName, 30);
+  showNotification("Profile saved!");
+}
+
+// ----- File Manager Functions -----
 let files = [];
 let currentFileIndex = -1;
 
@@ -194,7 +292,7 @@ function updateFileList() {
   files.forEach((file, index) => {
     const li = document.createElement("li");
     li.textContent = file.name;
-    li.onclick = () => {
+    li.onclick = function() {
       currentFileIndex = index;
       document.getElementById("fileContent").value = file.content;
     };
