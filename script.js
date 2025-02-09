@@ -405,3 +405,95 @@ function draw(e) {
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+// Snake Game Logic
+let snake = [];
+let food = {};
+let direction = 'right';
+let score = 0;
+let snakeCanvas, ctx;
+
+function initSnakeGame() {
+  snakeCanvas = document.getElementById('snakeCanvas');
+  ctx = snakeCanvas.getContext('2d');
+  resetSnake();
+  document.addEventListener('keydown', handleSnakeKeys);
+}
+
+function resetSnake() {
+  snake = [{x: 10, y: 10}];
+  direction = 'right';
+  score = 0;
+  spawnFood();
+  updateScore();
+  gameLoop();
+}
+
+function handleSnakeKeys(e) {
+  const key = e.key.replace('Arrow', '').toLowerCase();
+  const validMoves = {
+    right: ['up', 'down'],
+    left: ['up', 'down'],
+    up: ['left', 'right'],
+    down: ['left', 'right']
+  };
+  if (validMoves[direction].includes(key)) direction = key;
+}
+
+function gameLoop() {
+  moveSnake();
+  if (checkCollision()) return gameOver();
+  
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, 300, 300);
+  
+  // Draw snake
+  snake.forEach((seg, i) => {
+    ctx.fillStyle = i === 0 ? '#e74c3c' : '#2ecc71';
+    ctx.fillRect(seg.x * 10, seg.y * 10, 8, 8);
+  });
+  
+  // Draw food
+  ctx.fillStyle = '#3498db';
+  ctx.fillRect(food.x * 10, food.y * 10, 8, 8);
+  
+  setTimeout(gameLoop, 100);
+}
+
+function moveSnake() {
+  const head = {...snake[0]};
+  switch(direction) {
+    case 'up': head.y--; break;
+    case 'down': head.y++; break;
+    case 'left': head.x--; break;
+    case 'right': head.x++; break;
+  }
+  snake.unshift(head);
+  if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    updateScore();
+    spawnFood();
+  } else {
+    snake.pop();
+  }
+}
+
+function spawnFood() {
+  food = {
+    x: Math.floor(Math.random() * 30),
+    y: Math.floor(Math.random() * 30)
+  };
+}
+
+function checkCollision() {
+  const head = snake[0];
+  return head.x < 0 || head.x >= 30 || head.y < 0 || head.y >= 30 ||
+    snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y);
+}
+
+function gameOver() {
+  showNotification(`Game Over! Score: ${score}`, { persistent: true });
+}
+
+function updateScore() {
+  document.getElementById('snakeScore').textContent = score;
+}
