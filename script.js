@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-  // If no login credentials, show login screen; else start OS
   if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
     document.getElementById("loginScreen").style.display = "flex";
   } else {
@@ -12,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function() {
   loadFiles();
   loadTodos();
   initPaint();
-  // Apply saved theme and wallpaper (if any)
   let savedTheme = localStorage.getItem("theme");
   if (savedTheme) applyTheme(savedTheme);
   let savedWallpaper = localStorage.getItem("wallpaper");
@@ -21,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-// ---------- DRAGGABLE WINDOWS ----------
 function initDraggableWindows() {
   const wins = document.querySelectorAll(".window");
   wins.forEach(win => dragElement(win));
@@ -56,7 +53,6 @@ function dragElement(elmnt) {
   }
 }
 
-// ---------- CLOCK & WELCOME ----------
 function updateClock() {
   const now = new Date();
   document.getElementById("clock").textContent = now.toLocaleTimeString();
@@ -64,13 +60,11 @@ function updateClock() {
 function loadUserProfile() {
   let uname = localStorage.getItem("username") || "User";
   document.getElementById("welcomeMsg").textContent = "Welcome, " + uname;
-  let avatar = localStorage.getItem("avatar") ||
-    "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg";
+  let avatar = localStorage.getItem("avatar") || "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg";
   document.getElementById("navAvatar").src = avatar;
   document.getElementById("bootAvatar").src = avatar;
 }
 
-// ---------- LOGIN & REGISTRATION ----------
 function login() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
@@ -91,7 +85,6 @@ function registerUser() {
   if (username && password) {
     localStorage.setItem("username", username);
     localStorage.setItem("password", password);
-    // Set default avatar and profile name
     localStorage.setItem("avatar", "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg");
     localStorage.setItem("profileName", username);
     showNotification("Registration successful! Please login.");
@@ -100,7 +93,6 @@ function registerUser() {
   }
 }
 
-// ---------- BOOT & START OS ----------
 function startOS() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("bootScreen").style.display = "flex";
@@ -110,7 +102,6 @@ function startOS() {
   }, 2000);
 }
 
-// ---------- WINDOW MANAGEMENT ----------
 function openApp(id) {
   document.getElementById(id).style.display = "block";
 }
@@ -142,7 +133,6 @@ function maximizeWindow(id) {
   }
 }
 
-// ---------- NOTIFICATIONS ----------
 function showNotification(message) {
   const container = document.getElementById("notificationContainer");
   const notif = document.createElement("div");
@@ -152,14 +142,13 @@ function showNotification(message) {
   setTimeout(() => { notif.remove(); }, 3000);
 }
 
-// ---------- THEME & WALLPAPER ----------
 function setTheme(theme) {
   localStorage.setItem("theme", theme);
   applyTheme(theme);
   showNotification("Theme set to " + theme);
 }
 function applyTheme(theme) {
-  document.body.className = ""; // reset theme classes
+  document.body.className = "";
   document.body.classList.add("theme-" + theme);
 }
 function changeWallpaper(wallpaper) {
@@ -181,7 +170,6 @@ function toggleApp(appId, enabled) {
   if (btn) btn.style.display = enabled ? "inline-block" : "none";
 }
 
-// ---------- PROFILE (in Settings) ----------
 function selectAvatarFromSettings(src) {
   localStorage.setItem("avatar", src);
   loadUserProfile();
@@ -198,7 +186,6 @@ function saveProfile() {
   }
 }
 
-// ---------- FILE MANAGER ----------
 let files = [];
 let currentFileIndex = -1;
 function loadFiles() {
@@ -271,7 +258,6 @@ function importNotes() {
   }
 }
 
-// ---------- NOTES APP ----------
 function saveNote() {
   const note = document.getElementById("notesContent").value;
   localStorage.setItem("note", encodeURIComponent(note));
@@ -283,7 +269,6 @@ function deleteNote() {
   showNotification("Note deleted!");
 }
 
-// ---------- CALCULATOR ----------
 function calcInput(val) {
   document.getElementById("calcDisplay").value += val;
 }
@@ -299,26 +284,23 @@ function calcCalculate() {
   }
 }
 
-// ---------- TERMINAL ----------
 function terminalEnter(event) {
   if (event.key === "Enter") {
-    const input = event.target.value;
+    const input = document.getElementById("terminalInput").value;
     const out = document.getElementById("terminalOutput");
     const line = document.createElement("div");
     line.textContent = "> " + input;
     out.appendChild(line);
-    event.target.value = "";
+    document.getElementById("terminalInput").value = "";
     out.scrollTop = out.scrollHeight;
   }
 }
 
-// ---------- WEB BROWSER ----------
 function loadURL() {
   const url = document.getElementById("browserURL").value;
   if (url) document.getElementById("browserFrame").src = url;
 }
 
-// ---------- MEDIA PLAYER ----------
 function loadMusic() {
   const url = document.getElementById("musicURL").value;
   if (url) {
@@ -329,7 +311,6 @@ function loadMusic() {
   }
 }
 
-// ---------- CAMERA APP ----------
 let cameraStream;
 function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -352,7 +333,6 @@ function stopCamera() {
   }
 }
 
-// ---------- TASK MANAGER ----------
 function updateTaskManager() {
   const mgr = document.getElementById("runningApps");
   mgr.innerHTML = "";
@@ -367,10 +347,6 @@ function updateTaskManager() {
 }
 setInterval(updateTaskManager, 5000);
 
-// ---------- ADDITIONAL APPS ----------
-// WEATHER APP: Already in HTML (static info)
-// CALENDAR APP: Static placeholder text
-// TO-DO APP:
 let todos = [];
 function loadTodos() {
   const data = localStorage.getItem("todos");
@@ -406,7 +382,6 @@ function saveTodos() {
   localStorage.setItem("todos", JSON.stringify(todos));
 }
 
-// PAINT APP:
 let canvas, ctx, painting = false;
 function initPaint() {
   canvas = document.getElementById("paintCanvas");
@@ -429,11 +404,4 @@ function draw(e) {
 }
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// CONTACTS APP: (static list already in HTML)
-
-// ---------- LAUNCH BUTTON: Show extra apps ----------
-function openLaunch() {
-  openApp("launchApp");
 }
