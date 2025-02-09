@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
   loadFiles();
   loadTodos();
   initPaint();
+  initSnakeGame();
   let savedTheme = localStorage.getItem("theme");
   if (savedTheme) applyTheme(savedTheme);
   let savedWallpaper = localStorage.getItem("wallpaper");
@@ -497,3 +498,81 @@ function gameOver() {
 function updateScore() {
   document.getElementById('snakeScore').textContent = score;
 }
+// Enhanced Calendar Logic
+let currentDate = new Date();
+
+function updateCalendar() {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  document.getElementById('calendarMonth').textContent = 
+    `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+  
+  const calendarGrid = document.getElementById('calendarGrid');
+  calendarGrid.innerHTML = '';
+  
+  // Add day cells
+  const daysInMonth = new Date(
+    currentDate.getFullYear(), 
+    currentDate.getMonth() + 1, 
+    0
+  ).getDate();
+  
+  for (let i = 1; i <= daysInMonth; i++) {
+    const day = document.createElement('div');
+    day.className = 'calendar-day';
+    day.textContent = i;
+    day.onclick = () => showDayEvents(i);
+    calendarGrid.appendChild(day);
+  }
+}
+
+function changeMonth(offset) {
+  currentDate.setMonth(currentDate.getMonth() + offset);
+  updateCalendar();
+}
+
+function addEvent() {
+  const eventText = document.getElementById('eventInput').value;
+  if (eventText) {
+    const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+    events.push({
+      date: currentDate.toISOString().slice(0, 10),
+      text: eventText
+    });
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+    updateEventList();
+  }
+}
+
+function updateEventList() {
+  const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+  const eventList = document.getElementById('eventList');
+  eventList.innerHTML = events
+    .filter(e => e.date === currentDate.toISOString().slice(0, 10))
+    .map(e => `<li>${e.text}</li>`)
+    .join('');
+}
+// Theme Creator Logic
+function saveCustomTheme() {
+  const theme = {
+    primary: document.getElementById('themePrimary').value,
+    background: document.getElementById('themeBackground').value,
+    text: document.getElementById('themeText').value,
+    font: document.getElementById('themeFont').value
+  };
+  
+  localStorage.setItem('customTheme', JSON.stringify(theme));
+  applyCustomTheme(theme);
+}
+
+function applyCustomTheme(theme) {
+  document.documentElement.style.setProperty('--primary-color', theme.primary);
+  document.body.style.backgroundColor = theme.background;
+  document.body.style.color = theme.text;
+  document.body.style.fontFamily = theme.font;
+}
+
+// Load custom theme on startup
+const savedTheme = localStorage.getItem('customTheme');
+if (savedTheme) applyCustomTheme(JSON.parse(savedTheme));
