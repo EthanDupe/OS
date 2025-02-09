@@ -1,30 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Web OS with Improved UI</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web OS</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Taskbar -->
-  <div id="taskbar">
-    <button id="notesButton">Notes</button>
-  </div>
 
-  <!-- Notes App Window -->
-  <div id="notesApp" class="window" style="display: none;">
-    <div class="title-bar">
-      <span>Notes App</span>
-      <button class="close-btn" onclick="closeNotesApp()">X</button>
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <button onclick="openApp('notesApp')">📝 Notes</button>
+        <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
+        <button onclick="openApp('terminalApp')">💻 Terminal</button>
+        <button onclick="openApp('browserApp')">🌐 Browser</button>
+        <button onclick="openApp('settingsApp')">⚙ Settings</button>
     </div>
-    <div class="window-content">
-      <textarea id="notesContent" rows="10" cols="30" placeholder="Type your note here..."></textarea>
-      <br>
-      <button onclick="saveNote()">Save</button>
-      <button onclick="deleteNote()">Delete</button>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
+    <!-- Notes App -->
+    <div id="notesApp" class="window">
+        <div class="title-bar">
+            <span>Notes</span>
+            <button onclick="closeApp('notesApp')">X</button>
+        </div>
+        <textarea id="notesContent" placeholder="Type your note..."></textarea>
+        <button onclick="saveNote()">Save</button>
+        <button onclick="deleteNote()">Delete</button>
+    </div>
+
+    <!-- Calculator App -->
+    <div id="calculatorApp" class="window">
+        <div class="title-bar">
+            <span>Calculator</span>
+            <button onclick="closeApp('calculatorApp')">X</button>
+        </div>
+        <input type="text" id="calcDisplay" disabled>
+        <div class="buttons">
+            <button onclick="calcInput('1')">1</button>
+            <button onclick="calcInput('2')">2</button>
+            <button onclick="calcInput('3')">3</button>
+            <button onclick="calcInput('+')">+</button>
+            <button onclick="calcInput('4')">4</button>
+            <button onclick="calcInput('5')">5</button>
+            <button onclick="calcInput('6')">6</button>
+            <button onclick="calcInput('-')">-</button>
+            <button onclick="calcInput('7')">7</button>
+            <button onclick="calcInput('8')">8</button>
+            <button onclick="calcInput('9')">9</button>
+            <button onclick="calcInput('*')">*</button>
+            <button onclick="calcInput('0')">0</button>
+            <button onclick="calcClear()">C</button>
+            <button onclick="calcCalculate()">=</button>
+            <button onclick="calcInput('/')">/</button>
+        </div>
+    </div>
+
+    <!-- Terminal App -->
+    <div id="terminalApp" class="window">
+        <div class="title-bar">
+            <span>Terminal</span>
+            <button onclick="closeApp('terminalApp')">X</button>
+        </div>
+        <div id="terminalOutput"></div>
+        <input type="text" id="terminalInput" onkeypress="terminalEnter(event)">
+    </div>
+
+    <!-- Web Browser -->
+    <div id="browserApp" class="window">
+        <div class="title-bar">
+            <span>Web Browser</span>
+            <button onclick="closeApp('browserApp')">X</button>
+        </div>
+        <iframe src="https://www.google.com" width="100%" height="90%"></iframe>
+    </div>
+
+    <!-- Settings App -->
+    <div id="settingsApp" class="window">
+        <div class="title-bar">
+            <span>Settings</span>
+            <button onclick="closeApp('settingsApp')">X</button>
+        </div>
+        <button onclick="setTheme('dark')">Dark Mode</button>
+        <button onclick="setTheme('light')">Light Mode</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
