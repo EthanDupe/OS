@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <h2>Login</h2>
+    <input type="text" id="loginUsername" placeholder="Username">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p>Don't have an account? <button onclick="registerUser()">Register</button></p>
+  </div>
+
   <!-- Boot Up Screen -->
   <div id="bootScreen">
     <div class="loader"></div>
@@ -18,20 +27,27 @@
 
   <!-- Taskbar -->
   <div id="taskbar">
-    <button onclick="openApp('notesApp')">📝 Notes</button>
-    <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
-    <button onclick="openApp('terminalApp')">💻 Terminal</button>
-    <button onclick="openApp('browserApp')">🌐 Browser</button>
-    <button onclick="openApp('fileManagerApp')">📁 File Manager</button>
-    <button onclick="openApp('mediaPlayerApp')">🎵 Media Player</button>
-    <button onclick="openApp('settingsApp')">⚙ Settings</button>
+    <div id="taskbarIcons">
+      <button onclick="openApp('notesApp')">📝 Notes</button>
+      <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
+      <button onclick="openApp('terminalApp')">💻 Terminal</button>
+      <button onclick="openApp('browserApp')">🌐 Browser</button>
+      <button onclick="openApp('fileManagerApp')">📁 File Manager</button>
+      <button onclick="openApp('mediaPlayerApp')">🎵 Media Player</button>
+      <button onclick="openApp('settingsApp')">⚙ Settings</button>
+    </div>
+    <div id="minimizedWindows"></div>
   </div>
 
   <!-- Notes App -->
   <div id="notesApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Notes</span>
-      <button onclick="closeApp('notesApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('notesApp')">_</button>
+        <button onclick="maximizeWindow('notesApp')">[ ]</button>
+        <button onclick="closeApp('notesApp')">X</button>
+      </div>
     </div>
     <textarea id="notesContent" placeholder="Type your note..."></textarea>
     <div class="app-buttons">
@@ -44,9 +60,13 @@
   <div id="calculatorApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Calculator</span>
-      <button onclick="closeApp('calculatorApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('calculatorApp')">_</button>
+        <button onclick="maximizeWindow('calculatorApp')">[ ]</button>
+        <button onclick="closeApp('calculatorApp')">X</button>
+      </div>
     </div>
-    <input type="text" id="calcDisplay" disabled />
+    <input type="text" id="calcDisplay" disabled>
     <div class="calc-buttons">
       <button onclick="calcInput('7')">7</button>
       <button onclick="calcInput('8')">8</button>
@@ -71,17 +91,25 @@
   <div id="terminalApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Terminal</span>
-      <button onclick="closeApp('terminalApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('terminalApp')">_</button>
+        <button onclick="maximizeWindow('terminalApp')">[ ]</button>
+        <button onclick="closeApp('terminalApp')">X</button>
+      </div>
     </div>
     <div id="terminalOutput" class="terminal-output"></div>
-    <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)" />
+    <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)">
   </div>
 
   <!-- Web Browser App -->
   <div id="browserApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Web Browser</span>
-      <button onclick="closeApp('browserApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('browserApp')">_</button>
+        <button onclick="maximizeWindow('browserApp')">[ ]</button>
+        <button onclick="closeApp('browserApp')">X</button>
+      </div>
     </div>
     <iframe src="https://www.google.com" frameborder="0"></iframe>
   </div>
@@ -90,7 +118,11 @@
   <div id="fileManagerApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>File Manager</span>
-      <button onclick="closeApp('fileManagerApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('fileManagerApp')">_</button>
+        <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
+        <button onclick="closeApp('fileManagerApp')">X</button>
+      </div>
     </div>
     <div class="file-manager">
       <button onclick="createNewFile()">New File</button>
@@ -107,10 +139,14 @@
   <div id="mediaPlayerApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Media Player</span>
-      <button onclick="closeApp('mediaPlayerApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('mediaPlayerApp')">_</button>
+        <button onclick="maximizeWindow('mediaPlayerApp')">[ ]</button>
+        <button onclick="closeApp('mediaPlayerApp')">X</button>
+      </div>
     </div>
     <audio id="audioPlayer" controls>
-      <source src="sample.mp3" type="audio/mpeg" />
+      <source src="sample.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
   </div>
@@ -119,11 +155,44 @@
   <div id="settingsApp" class="window" style="display: none;">
     <div class="title-bar">
       <span>Settings</span>
-      <button onclick="closeApp('settingsApp')">X</button>
+      <div class="window-controls">
+        <button onclick="minimizeWindow('settingsApp')">_</button>
+        <button onclick="maximizeWindow('settingsApp')">[ ]</button>
+        <button onclick="closeApp('settingsApp')">X</button>
+      </div>
     </div>
     <div class="settings">
+      <h3>Theme &amp; Wallpaper</h3>
       <button onclick="setTheme('dark')">Dark Mode</button>
       <button onclick="setTheme('light')">Light Mode</button>
+      <select id="wallpaperSelect" onchange="changeWallpaper(this.value)">
+        <option value="default">Default</option>
+        <option value="wallpaper1.jpg">Wallpaper 1</option>
+        <option value="wallpaper2.jpg">Wallpaper 2</option>
+      </select>
+      <h3>Language</h3>
+      <select id="languageSelect" onchange="setLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <!-- More languages as needed -->
+      </select>
+      <h3>App Management</h3>
+      <div id="appManagement">
+        <label><input type="checkbox" onchange="toggleApp('notesApp', this.checked)" checked> Notes</label>
+        <label><input type="checkbox" onchange="toggleApp('calculatorApp', this.checked)" checked> Calculator</label>
+        <label><input type="checkbox" onchange="toggleApp('terminalApp', this.checked)" checked> Terminal</label>
+        <label><input type="checkbox" onchange="toggleApp('browserApp', this.checked)" checked> Browser</label>
+        <label><input type="checkbox" onchange="toggleApp('fileManagerApp', this.checked)" checked> File Manager</label>
+        <label><input type="checkbox" onchange="toggleApp('mediaPlayerApp', this.checked)" checked> Media Player</label>
+      </div>
+      <h3>User Profile</h3>
+      <input type="text" id="profileName" placeholder="Display Name">
+      <select id="avatarSelect" onchange="changeAvatar(this.value)">
+        <option value="avatar1.png">Avatar 1</option>
+        <option value="avatar2.png">Avatar 2</option>
+        <!-- More avatars as needed -->
+      </select>
+      <button onclick="saveProfile()">Save Profile</button>
     </div>
   </div>
 
