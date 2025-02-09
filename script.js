@@ -1,3 +1,4 @@
+// When the DOM loads, initialize the OS
 document.addEventListener("DOMContentLoaded", function() {
   if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
     document.getElementById("loginScreen").style.display = "flex";
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
   loadFiles();
   loadTodos();
   initPaint();
-  initSnakeGame();
+  // Apply saved theme and wallpaper (if any)
   let savedTheme = localStorage.getItem("theme");
   if (savedTheme) applyTheme(savedTheme);
   let savedWallpaper = localStorage.getItem("wallpaper");
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
+// ---------- DRAGGABLE WINDOWS ----------
 function initDraggableWindows() {
   const wins = document.querySelectorAll(".window");
   wins.forEach(win => dragElement(win));
@@ -54,6 +56,7 @@ function dragElement(elmnt) {
   }
 }
 
+// ---------- CLOCK & WELCOME ----------
 function updateClock() {
   const now = new Date();
   document.getElementById("clock").textContent = now.toLocaleTimeString();
@@ -61,11 +64,13 @@ function updateClock() {
 function loadUserProfile() {
   let uname = localStorage.getItem("username") || "User";
   document.getElementById("welcomeMsg").textContent = "Welcome, " + uname;
-  let avatar = localStorage.getItem("avatar") || "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg";
+  let avatar = localStorage.getItem("avatar") ||
+    "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg";
   document.getElementById("navAvatar").src = avatar;
   document.getElementById("bootAvatar").src = avatar;
 }
 
+// ---------- LOGIN & REGISTRATION ----------
 function login() {
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
@@ -86,6 +91,7 @@ function registerUser() {
   if (username && password) {
     localStorage.setItem("username", username);
     localStorage.setItem("password", password);
+    // Set default avatar and profile name (do not offer avatar selection on signup)
     localStorage.setItem("avatar", "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg");
     localStorage.setItem("profileName", username);
     showNotification("Registration successful! Please login.");
@@ -94,6 +100,7 @@ function registerUser() {
   }
 }
 
+// ---------- BOOT & START OS ----------
 function startOS() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("bootScreen").style.display = "flex";
@@ -103,6 +110,7 @@ function startOS() {
   }, 2000);
 }
 
+// ---------- WINDOW MANAGEMENT ----------
 function openApp(id) {
   document.getElementById(id).style.display = "block";
 }
@@ -134,6 +142,7 @@ function maximizeWindow(id) {
   }
 }
 
+// ---------- NOTIFICATIONS ----------
 function showNotification(message) {
   const container = document.getElementById("notificationContainer");
   const notif = document.createElement("div");
@@ -143,6 +152,7 @@ function showNotification(message) {
   setTimeout(() => { notif.remove(); }, 3000);
 }
 
+// ---------- THEME & WALLPAPER ----------
 function setTheme(theme) {
   localStorage.setItem("theme", theme);
   applyTheme(theme);
@@ -171,6 +181,7 @@ function toggleApp(appId, enabled) {
   if (btn) btn.style.display = enabled ? "inline-block" : "none";
 }
 
+// ---------- PROFILE (in Settings) ----------
 function selectAvatarFromSettings(src) {
   localStorage.setItem("avatar", src);
   loadUserProfile();
@@ -187,6 +198,7 @@ function saveProfile() {
   }
 }
 
+// ---------- FILE MANAGER ----------
 let files = [];
 let currentFileIndex = -1;
 function loadFiles() {
@@ -270,6 +282,7 @@ function deleteNote() {
   showNotification("Note deleted!");
 }
 
+// ---------- CALCULATOR ----------
 function calcInput(val) {
   document.getElementById("calcDisplay").value += val;
 }
@@ -285,6 +298,7 @@ function calcCalculate() {
   }
 }
 
+// ---------- TERMINAL ----------
 function terminalEnter(event) {
   if (event.key === "Enter") {
     const input = document.getElementById("terminalInput").value;
@@ -297,11 +311,13 @@ function terminalEnter(event) {
   }
 }
 
+// ---------- WEB BROWSER ----------
 function loadURL() {
   const url = document.getElementById("browserURL").value;
   if (url) document.getElementById("browserFrame").src = url;
 }
 
+// ---------- MEDIA PLAYER ----------
 function loadMusic() {
   const url = document.getElementById("musicURL").value;
   if (url) {
@@ -312,6 +328,7 @@ function loadMusic() {
   }
 }
 
+// ---------- CAMERA APP ----------
 let cameraStream;
 function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -334,6 +351,49 @@ function stopCamera() {
   }
 }
 
+// ---------- GAMES APP (Tic Tac Toe) ----------
+let tttBoard = Array(9).fill("");
+let currentPlayer = "X";
+function makeMove(index) {
+  if (tttBoard[index] === "" && !checkWinner()) {
+    tttBoard[index] = currentPlayer;
+    updateTttBoard();
+    if (checkWinner()) {
+      document.getElementById("gameStatus").textContent = "Player " + currentPlayer + " wins!";
+      showNotification("Player " + currentPlayer + " wins!");
+    } else if (tttBoard.every(cell => cell !== "")) {
+      document.getElementById("gameStatus").textContent = "Draw!";
+      showNotification("Game drawn!");
+    } else {
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      document.getElementById("gameStatus").textContent = "Current Player: " + currentPlayer;
+    }
+  }
+}
+function updateTttBoard() {
+  const cells = document.querySelectorAll("#ticTacToeBoard .cell");
+  cells.forEach((cell, index) => {
+    cell.textContent = tttBoard[index];
+  });
+}
+function checkWinner() {
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8], // rows
+    [0,3,6],[1,4,7],[2,5,8], // cols
+    [0,4,8],[2,4,6]          // diags
+  ];
+  return wins.some(combo => {
+    return combo.every(i => tttBoard[i] === currentPlayer);
+  });
+}
+function resetGame() {
+  tttBoard = Array(9).fill("");
+  currentPlayer = "X";
+  updateTttBoard();
+  document.getElementById("gameStatus").textContent = "Current Player: " + currentPlayer;
+}
+
+// ---------- TASK MANAGER ----------
 function updateTaskManager() {
   const mgr = document.getElementById("runningApps");
   mgr.innerHTML = "";
@@ -348,6 +408,7 @@ function updateTaskManager() {
 }
 setInterval(updateTaskManager, 5000);
 
+// ---------- TO-DO APP ----------
 let todos = [];
 function loadTodos() {
   const data = localStorage.getItem("todos");
@@ -383,6 +444,7 @@ function saveTodos() {
   localStorage.setItem("todos", JSON.stringify(todos));
 }
 
+// ---------- PAINT APP ----------
 let canvas, ctx, painting = false;
 function initPaint() {
   canvas = document.getElementById("paintCanvas");
@@ -406,173 +468,3 @@ function draw(e) {
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
-// Snake Game Logic
-let snake = [];
-let food = {};
-let direction = 'right';
-let score = 0;
-let snakeCanvas, ctx;
-
-function initSnakeGame() {
-  snakeCanvas = document.getElementById('snakeCanvas');
-  ctx = snakeCanvas.getContext('2d');
-  resetSnake();
-  document.addEventListener('keydown', handleSnakeKeys);
-}
-
-function resetSnake() {
-  snake = [{x: 10, y: 10}];
-  direction = 'right';
-  score = 0;
-  spawnFood();
-  updateScore();
-  gameLoop();
-}
-
-function handleSnakeKeys(e) {
-  const key = e.key.replace('Arrow', '').toLowerCase();
-  const validMoves = {
-    right: ['up', 'down'],
-    left: ['up', 'down'],
-    up: ['left', 'right'],
-    down: ['left', 'right']
-  };
-  if (validMoves[direction].includes(key)) direction = key;
-}
-
-function gameLoop() {
-  moveSnake();
-  if (checkCollision()) return gameOver();
-  
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, 300, 300);
-  
-  // Draw snake
-  snake.forEach((seg, i) => {
-    ctx.fillStyle = i === 0 ? '#e74c3c' : '#2ecc71';
-    ctx.fillRect(seg.x * 10, seg.y * 10, 8, 8);
-  });
-  
-  // Draw food
-  ctx.fillStyle = '#3498db';
-  ctx.fillRect(food.x * 10, food.y * 10, 8, 8);
-  
-  setTimeout(gameLoop, 100);
-}
-
-function moveSnake() {
-  const head = {...snake[0]};
-  switch(direction) {
-    case 'up': head.y--; break;
-    case 'down': head.y++; break;
-    case 'left': head.x--; break;
-    case 'right': head.x++; break;
-  }
-  snake.unshift(head);
-  if (head.x === food.x && head.y === food.y) {
-    score += 10;
-    updateScore();
-    spawnFood();
-  } else {
-    snake.pop();
-  }
-}
-
-function spawnFood() {
-  food = {
-    x: Math.floor(Math.random() * 30),
-    y: Math.floor(Math.random() * 30)
-  };
-}
-
-function checkCollision() {
-  const head = snake[0];
-  return head.x < 0 || head.x >= 30 || head.y < 0 || head.y >= 30 ||
-    snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y);
-}
-
-function gameOver() {
-  showNotification(`Game Over! Score: ${score}`, { persistent: true });
-}
-
-function updateScore() {
-  document.getElementById('snakeScore').textContent = score;
-}
-// Enhanced Calendar Logic
-let currentDate = new Date();
-
-function updateCalendar() {
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  
-  document.getElementById('calendarMonth').textContent = 
-    `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-  
-  const calendarGrid = document.getElementById('calendarGrid');
-  calendarGrid.innerHTML = '';
-  
-  // Add day cells
-  const daysInMonth = new Date(
-    currentDate.getFullYear(), 
-    currentDate.getMonth() + 1, 
-    0
-  ).getDate();
-  
-  for (let i = 1; i <= daysInMonth; i++) {
-    const day = document.createElement('div');
-    day.className = 'calendar-day';
-    day.textContent = i;
-    day.onclick = () => showDayEvents(i);
-    calendarGrid.appendChild(day);
-  }
-}
-
-function changeMonth(offset) {
-  currentDate.setMonth(currentDate.getMonth() + offset);
-  updateCalendar();
-}
-
-function addEvent() {
-  const eventText = document.getElementById('eventInput').value;
-  if (eventText) {
-    const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-    events.push({
-      date: currentDate.toISOString().slice(0, 10),
-      text: eventText
-    });
-    localStorage.setItem('calendarEvents', JSON.stringify(events));
-    updateEventList();
-  }
-}
-
-function updateEventList() {
-  const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-  const eventList = document.getElementById('eventList');
-  eventList.innerHTML = events
-    .filter(e => e.date === currentDate.toISOString().slice(0, 10))
-    .map(e => `<li>${e.text}</li>`)
-    .join('');
-}
-// Theme Creator Logic
-function saveCustomTheme() {
-  const theme = {
-    primary: document.getElementById('themePrimary').value,
-    background: document.getElementById('themeBackground').value,
-    text: document.getElementById('themeText').value,
-    font: document.getElementById('themeFont').value
-  };
-  
-  localStorage.setItem('customTheme', JSON.stringify(theme));
-  applyCustomTheme(theme);
-}
-
-function applyCustomTheme(theme) {
-  document.documentElement.style.setProperty('--primary-color', theme.primary);
-  document.body.style.backgroundColor = theme.background;
-  document.body.style.color = theme.text;
-  document.body.style.fontFamily = theme.font;
-}
-
-// Load custom theme on startup
-const savedTheme = localStorage.getItem('customTheme');
-if (savedTheme) applyCustomTheme(JSON.parse(savedTheme));
