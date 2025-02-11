@@ -271,7 +271,6 @@ function importNotes() {
     showNotification("No note content to import.");
   }
 }
-
 function saveNote() {
   const note = document.getElementById("notesContent").value;
   localStorage.setItem("note", encodeURIComponent(note));
@@ -496,4 +495,50 @@ function draw(e) {
 }
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ---------- FILE SEARCH FOR FILE MANAGER ----------
+function filterFileList() {
+  const query = document.getElementById("fileSearch").value.toLowerCase();
+  const listItems = document.querySelectorAll("#fileList li");
+  listItems.forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(query) ? "block" : "none";
+  });
+}
+
+// ---------- VOICE COMMANDS ----------
+function toggleVoiceCommands() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showNotification("Voice commands not supported in your browser.");
+    return;
+  }
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+  recognition.onresult = (event) => {
+    const command = event.results[0][0].transcript.toLowerCase();
+    showNotification("Voice command: " + command);
+    processVoiceCommand(command);
+  };
+  recognition.onerror = (e) => showNotification("Voice error: " + e.error);
+  recognition.start();
+}
+function processVoiceCommand(command) {
+  if (command.includes("open notes")) {
+    openApp("notesApp");
+  } else if (command.includes("open terminal")) {
+    openApp("terminalApp");
+  } else if (command.includes("clear notes")) {
+    deleteNote();
+  } else {
+    showNotification("Command not recognized.");
+  }
+}
+
+// ---------- HIGH CONTRAST MODE ----------
+function toggleHighContrast() {
+  document.body.classList.toggle("high-contrast");
+  showNotification("High Contrast mode " + (document.body.classList.contains("high-contrast") ? "enabled" : "disabled"));
 }
