@@ -32,7 +32,7 @@ Web OS is a fun and functional virtual operating system built using HTML, CSS, a
 
 To try out Web OS, simply visit the live demo here:
 
-**[Web OS Demo](https://ethandupe.github.io/os)**
+**[Web OS Demo](https://ethandupe.github.io/OS/)**
 
 Once the Web OS is loaded in your browser:
 
