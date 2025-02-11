@@ -1,4 +1,3 @@
-// When the DOM loads, initialize the OS
 document.addEventListener("DOMContentLoaded", function() {
   if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
     document.getElementById("loginScreen").style.display = "flex";
@@ -91,7 +90,7 @@ function registerUser() {
   if (username && password) {
     localStorage.setItem("username", username);
     localStorage.setItem("password", password);
-    // Set default avatar and profile name (do not offer avatar selection on signup)
+    // Set default avatar and profile name (no avatar selection on signup)
     localStorage.setItem("avatar", "https://i.pinimg.com/736x/53/7c/8a/537c8a75f01598eb7559552f4c4b0dc7.jpg");
     localStorage.setItem("profileName", username);
     showNotification("Registration successful! Please login.");
@@ -113,6 +112,8 @@ function startOS() {
 // ---------- WINDOW MANAGEMENT ----------
 function openApp(id) {
   document.getElementById(id).style.display = "block";
+  // For calendar app, render calendar when opened
+  if (id === "calendarApp") renderCalendar();
 }
 function closeApp(id) {
   document.getElementById(id).style.display = "none";
@@ -298,15 +299,20 @@ function calcCalculate() {
   }
 }
 
-// ---------- TERMINAL ----------
+// ---------- TERMINAL (supports up to 100 responses) ----------
 function terminalEnter(event) {
   if (event.key === "Enter") {
-    const input = document.getElementById("terminalInput").value;
+    const inputField = document.getElementById("terminalInput");
+    const input = inputField.value;
     const out = document.getElementById("terminalOutput");
     const line = document.createElement("div");
     line.textContent = "> " + input;
     out.appendChild(line);
-    document.getElementById("terminalInput").value = "";
+    inputField.value = "";
+    // Keep only the latest 100 responses
+    while (out.children.length > 100) {
+      out.removeChild(out.firstChild);
+    }
     out.scrollTop = out.scrollHeight;
   }
 }
@@ -378,19 +384,42 @@ function updateTttBoard() {
 }
 function checkWinner() {
   const wins = [
-    [0,1,2],[3,4,5],[6,7,8], // rows
-    [0,3,6],[1,4,7],[2,5,8], // cols
-    [0,4,8],[2,4,6]          // diags
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
   ];
-  return wins.some(combo => {
-    return combo.every(i => tttBoard[i] === currentPlayer);
-  });
+  return wins.some(combo => combo.every(i => tttBoard[i] === currentPlayer));
 }
 function resetGame() {
   tttBoard = Array(9).fill("");
   currentPlayer = "X";
   updateTttBoard();
   document.getElementById("gameStatus").textContent = "Current Player: " + currentPlayer;
+}
+
+// ---------- CALENDAR APP (Functional) ----------
+function renderCalendar() {
+  const calendarEl = document.getElementById("calendarContent");
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let html = `<h3>${now.toLocaleString('default', { month: 'long' })} ${year}</h3>`;
+  html += `<table class="calendar-table"><thead><tr>
+             <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
+           </tr></thead><tbody><tr>`;
+  for (let i = 0; i < firstDay; i++) {
+    html += "<td></td>";
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    if ((firstDay + day - 1) % 7 === 0 && day !== 1) {
+      html += "</tr><tr>";
+    }
+    html += `<td>${day}</td>`;
+  }
+  html += "</tr></tbody></table>";
+  calendarEl.innerHTML = html;
 }
 
 // ---------- TASK MANAGER ----------
