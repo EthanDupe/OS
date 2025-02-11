@@ -345,6 +345,19 @@ body.theme-red {
   margin: 6px 4px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 15px;
+}
+.media-player button {
+  background: var(--primary-color);
+  color: var(--btn-text);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.media-player button:hover {
+  background: var(--primary-hover);
 }
 
 /* ---------- Camera ---------- */
@@ -383,6 +396,17 @@ body.theme-red {
 #gameStatus {
   margin: 12px;
   font-size: 1.2em;
+}
+
+/* ---------- Calendar ---------- */
+#calendarContent {
+  padding: 12px;
+  font-size: 15px;
+}
+
+/* ---------- To-Do, Paint, Contacts, etc. ---------- */
+.app-content {
+  padding: 12px;
 }
 
 /* ---------- Settings ---------- */
