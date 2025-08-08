@@ -1,367 +1,516 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Import Google Font -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web OS</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WebOS — Prototype</title>
+<style>
+  :root{
+    --bg:#0f1724; --panel:#0b1220; --accent:#06b6d4; --muted:#9aa7b2; --glass: rgba(255,255,255,0.03);
+    --text: #e6eef6; --radius:12px; --shadow: 0 8px 24px rgba(2,6,23,0.6);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:
+    radial-gradient(ellipse at 10% 10%, rgba(6,178,212,0.06), transparent 10%),
+    linear-gradient(180deg,#071021 0%, #00111a 100%);
+    color:var(--text);overflow:hidden;}
+  /* Desktop */
+  #desktop{position:fixed;inset:0;padding:16px;box-sizing:border-box;display:flex;flex-direction:column;}
+  .wallpaper{flex:1;border-radius:14px;background:linear-gradient(135deg, rgba(255,255,255,0.02), transparent);padding:12px;position:relative;overflow:hidden}
+  /* Taskbar */
+  #taskbar{height:56px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);position:fixed;left:16px;right:16px;bottom:16px;border-radius:14px;display:flex;align-items:center;padding:8px 12px;gap:10px;box-shadow:var(--shadow)}
+  .start-btn{width:44px;height:44px;border-radius:10px;background:var(--panel);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .tray{display:flex;gap:8px;align-items:center;margin-left:auto}
+  .task-icon{min-width:36px;height:36px;border-radius:8px;background:var(--glass);display:flex;align-items:center;justify-content:center;padding:4px;cursor:pointer}
+  /* Windows */
+  .window{position:absolute;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;min-width:280px;min-height:140px}
+  .titlebar{height:40px;background:linear-gradient(180deg, rgba(0,0,0,0.05), transparent);display:flex;align-items:center;padding:0 10px;gap:8px;cursor:grab}
+  .title{flex:1;font-weight:600}
+  .controls{display:flex;gap:6px}
+  .btn{width:30px;height:26px;border-radius:6px;background:transparent;border:none;color:var(--muted);cursor:pointer}
+  .content{padding:10px;flex:1;overflow:auto}
+  /* Resize handle */
+  .resizer{position:absolute;width:14px;height:14px;right:6px;bottom:6px;cursor:se-resize;background:transparent}
+  /* Start menu */
+  #startmenu{position:fixed;left:16px;bottom:76px;background:var(--panel);border-radius:12px;padding:12px;min-width:260px;box-shadow:var(--shadow);display:none;flex-direction:column;gap:8px}
+  .app-grid{display:grid;grid-template-columns:repeat(4,52px);gap:8px}
+  .app-tile{width:52px;height:52px;border-radius:10px;background:var(--glass);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;flex-direction:column}
+  /* Simple icons */
+  .icon{font-weight:700;color:var(--accent)}
+  /* Simple file list */
+  .file{padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+  /* Browser */
+  .browser-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .input{flex:1;height:34px;border-radius:8px;border:none;padding:0 10px;background:rgba(255,255,255,0.02);color:var(--text)}
+  .tabbar{display:flex;gap:6px;margin-bottom:8px}
+  .tab{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.01);cursor:pointer}
+  /* small helpers */
+  small{color:var(--muted)}
+  /* draggable cursor */
+  .dragging{cursor:grabbing !important}
+</style>
 </head>
 <body>
-  <!-- LOGIN SCREEN (if no credentials are stored) -->
-  <div id="loginScreen">
-    <div class="login-container">
-      <h2>Login / Register</h2>
-      <input type="text" id="loginUsername" placeholder="Username">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <div class="login-buttons">
-        <button onclick="login()">Login</button>
-        <button onclick="registerUser()">Register</button>
-      </div>
+<div id="desktop">
+  <div class="wallpaper" id="wall">
+    <h1 style="margin:8px 0 18px 8px">WebOS — Prototype</h1>
+    <p style="margin-left:8px;color:var(--muted)">Single-file virtual OS with window manager, apps, and a sandbox browser.</p>
+
+    <!-- Example short-cuts -->
+    <div id="shortcuts" style="position:absolute;left:12px;top:96px;display:flex;flex-direction:column;gap:8px">
+      <button class="app-tile" data-app="browser"><span class="icon">🌐</span><small>Browser</small></button>
+      <button class="app-tile" data-app="files"><span class="icon">📁</span><small>Files</small></button>
+      <button class="app-tile" data-app="notes"><span class="icon">📝</span><small>Notes</small></button>
+      <button class="app-tile" data-app="term"><span class="icon">>_</span><small>Terminal</small></button>
+    </div>
+
+    <!-- dynamic windows will be appended here -->
+  </div>
+
+  <div id="taskbar">
+    <div class="start-btn" id="startBtn">☰</div>
+    <div id="running" style="display:flex;gap:8px;align-items:center"></div>
+    <div class="tray">
+      <div class="task-icon" id="clock"></div>
+      <div class="task-icon" id="settingsBtn">⚙️</div>
     </div>
   </div>
 
-  <!-- BOOT SCREEN -->
-  <div id="bootScreen">
-    <div class="boot-loading">
-      <div class="loader">
-        <!-- Only the blue border rotates; the avatar inside remains static -->
-        <img id="bootAvatar" src="" alt="Avatar">
-      </div>
-      <p>Booting up...</p>
+  <div id="startmenu">
+    <div style="font-weight:700">Apps</div>
+    <div class="app-grid" id="appGrid">
+      <div class="app-tile" data-app="browser"><span class="icon">🌐</span></div>
+      <div class="app-tile" data-app="files"><span class="icon">📁</span></div>
+      <div class="app-tile" data-app="notes"><span class="icon">📝</span></div>
+      <div class="app-tile" data-app="term"><span class="icon">>_</span></div>
+      <div class="app-tile" data-app="settings"><span class="icon">⚙️</span></div>
     </div>
+    <div><small>Tip: Drag window titlebars to move, resize from corner.</small></div>
   </div>
+</div>
 
-  <!-- MAIN OS (hidden until booted) -->
-  <div id="mainOS" style="display: none;">
-    <!-- TASKBAR / NAVBAR -->
-    <div id="taskbar">
-      <div id="taskbarIcons">
-        <!-- Primary app buttons -->
-        <button onclick="openApp('notesApp')">📝 Notes</button>
-        <button onclick="openApp('calculatorApp')">🧮 Calculator</button>
-        <button onclick="openApp('terminalApp')">💻 Terminal</button>
-        <button onclick="openApp('browserApp')">🌐 Browser</button>
-        <button onclick="openApp('fileManagerApp')">📁 Files</button>
-        <button onclick="openApp('mediaPlayerApp')">🎵 Music</button>
-        <button onclick="openApp('cameraApp')">📷 Camera</button>
-        <button onclick="openApp('gamesApp')">🎮 Games</button>
-        <button onclick="openApp('settingsApp')">⚙ Settings</button>
-        <button onclick="openApp('taskManagerApp')">🗂 Task Manager</button>
-        <button onclick="openApp('launchApp')">☰ Launch</button>
-      </div>
-      <div id="taskbarRight">
-        <div id="clock"></div>
-        <div id="welcomeMsg"></div>
-        <img id="navAvatar" src="" alt="Avatar">
-        <!-- New Voice Command Button -->
-        <button id="voiceCommandBtn" onclick="toggleVoiceCommands()">🎤 Voice Cmd</button>
-      </div>
-      <div id="minimizedWindows"></div>
-    </div>
+<script>
+/* ========== Simple Window Manager =========== */
+const desktop = document.querySelector('.wallpaper');
+const startBtn = document.getElementById('startBtn');
+const startMenu = document.getElementById('startmenu');
+const runningBar = document.getElementById('running');
 
-    <!-- APP WINDOWS -->
+let zIndexCounter = 10;
+let windows = {}; // id -> element
 
-    <!-- NOTES APP -->
-    <div id="notesApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Notes</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('notesApp')">_</button>
-          <button onclick="maximizeWindow('notesApp')">[ ]</button>
-          <button onclick="closeApp('notesApp')">✕</button>
-        </div>
-      </div>
-      <textarea id="notesContent" placeholder="Type your note..."></textarea>
-      <div class="app-buttons">
-        <button onclick="saveNote()">Save</button>
-        <button onclick="deleteNote()">Delete</button>
-        <button onclick="importNotes()">Import to Files</button>
-      </div>
-    </div>
+function createWindow(opts){
+  const id = 'win_' + Math.random().toString(36).slice(2,9);
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.style.left = (50 + Math.random()*200) + 'px';
+  win.style.top = (40 + Math.random()*120) + 'px';
+  win.style.width = opts.width || '720px';
+  win.style.height = opts.height || '420px';
+  win.style.zIndex = ++zIndexCounter;
+  win.dataset.id = id;
 
-    <!-- CALCULATOR APP -->
-    <div id="calculatorApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Calculator</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('calculatorApp')">_</button>
-          <button onclick="maximizeWindow('calculatorApp')">[ ]</button>
-          <button onclick="closeApp('calculatorApp')">✕</button>
-        </div>
-      </div>
-      <input type="text" id="calcDisplay" disabled>
-      <div class="calc-buttons">
-        <button onclick="calcInput('7')">7</button>
-        <button onclick="calcInput('8')">8</button>
-        <button onclick="calcInput('9')">9</button>
-        <button onclick="calcInput('/')">÷</button>
-        <button onclick="calcInput('4')">4</button>
-        <button onclick="calcInput('5')">5</button>
-        <button onclick="calcInput('6')">6</button>
-        <button onclick="calcInput('*')">×</button>
-        <button onclick="calcInput('1')">1</button>
-        <button onclick="calcInput('2')">2</button>
-        <button onclick="calcInput('3')">3</button>
-        <button onclick="calcInput('-')">−</button>
-        <button onclick="calcInput('0')">0</button>
-        <button onclick="calcClear()">C</button>
-        <button onclick="calcCalculate()">=</button>
-        <button onclick="calcInput('+')">+</button>
-      </div>
-    </div>
+  // titlebar
+  const titlebar = document.createElement('div');
+  titlebar.className = 'titlebar';
+  const title = document.createElement('div'); title.className='title'; title.textContent = opts.title || 'Window';
+  const controls = document.createElement('div'); controls.className='controls';
+  const closeBtn = document.createElement('button'); closeBtn.className='btn'; closeBtn.textContent='✕';
+  const minBtn = document.createElement('button'); minBtn.className='btn'; minBtn.textContent='—';
+  const maxBtn = document.createElement('button'); maxBtn.className='btn'; maxBtn.textContent='▢';
 
-    <!-- TERMINAL APP -->
-    <div id="terminalApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Terminal</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('terminalApp')">_</button>
-          <button onclick="maximizeWindow('terminalApp')">[ ]</button>
-          <button onclick="closeApp('terminalApp')">✕</button>
-        </div>
-      </div>
-      <div id="terminalOutput" class="terminal-output"></div>
-      <input type="text" id="terminalInput" placeholder="Enter command..." onkeypress="terminalEnter(event)">
-    </div>
+  controls.append(minBtn, maxBtn, closeBtn);
+  titlebar.append(title, controls);
+  win.append(titlebar);
 
-    <!-- WEB BROWSER APP -->
-    <div id="browserApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Web Browser</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('browserApp')">_</button>
-          <button onclick="maximizeWindow('browserApp')">[ ]</button>
-          <button onclick="closeApp('browserApp')">✕</button>
-        </div>
-      </div>
-      <div class="browser-controls">
-        <input type="text" id="browserURL" placeholder="Enter URL">
-        <button onclick="loadURL()">Go</button>
-      </div>
-      <!-- Default now to duckduckgo -->
-      <iframe id="browserFrame" src="https://duckduckgo.com" frameborder="0"></iframe>
-    </div>
+  // content
+  const content = document.createElement('div'); content.className='content';
+  content.innerHTML = opts.html || '';
+  win.append(content);
 
-    <!-- FILE EXPLORER APP -->
-    <div id="fileManagerApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>File Explorer</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('fileManagerApp')">_</button>
-          <button onclick="maximizeWindow('fileManagerApp')">[ ]</button>
-          <button onclick="closeApp('fileManagerApp')">✕</button>
-        </div>
-      </div>
-      <div class="file-manager">
-        <button onclick="createNewFile()">New File</button>
-        <!-- Added file search input -->
-        <input type="text" id="fileSearch" placeholder="Search files..." oninput="filterFileList()">
-        <ul id="fileList"></ul>
-        <textarea id="fileContent" placeholder="File content..."></textarea>
-        <div class="app-buttons">
-          <button onclick="saveFile()">Save File</button>
-          <button onclick="deleteFile()">Delete File</button>
-        </div>
-      </div>
-    </div>
+  // resizer
+  const resizer = document.createElement('div'); resizer.className='resizer';
+  win.append(resizer);
 
-    <!-- MEDIA PLAYER APP -->
-    <div id="mediaPlayerApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Media Player</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('mediaPlayerApp')">_</button>
-          <button onclick="maximizeWindow('mediaPlayerApp')">[ ]</button>
-          <button onclick="closeApp('mediaPlayerApp')">✕</button>
-        </div>
-      </div>
-      <div class="media-player">
-        <input type="text" id="musicURL" placeholder="Enter music URL">
-        <button onclick="loadMusic()">Load Music</button>
-        <audio id="audioPlayer" controls>
-          <source src="sample.mp3" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      </div>
-    </div>
+  desktop.appendChild(win);
+  windows[id] = {el:win, title:opts.title};
 
-    <!-- CAMERA APP -->
-    <div id="cameraApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Camera</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('cameraApp')">_</button>
-          <button onclick="maximizeWindow('cameraApp')">[ ]</button>
-          <button onclick="closeApp('cameraApp')">✕</button>
-        </div>
-      </div>
-      <video id="cameraFeed" autoplay playsinline></video>
-      <div class="app-buttons">
-        <button onclick="startCamera()">Start Camera</button>
-        <button onclick="stopCamera()">Stop Camera</button>
-      </div>
-    </div>
+  // taskbar icon
+  const icon = document.createElement('div'); icon.className='task-icon'; icon.textContent = opts.icon || '▣';
+  icon.title = opts.title;
+  runningBar.appendChild(icon);
+  icon.onclick = () => {
+    focusWindow(win);
+  };
 
-    <!-- GAMES APP (Tic Tac Toe) -->
-    <div id="gamesApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Games - Tic Tac Toe</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('gamesApp')">_</button>
-          <button onclick="maximizeWindow('gamesApp')">[ ]</button>
-          <button onclick="closeApp('gamesApp')">✕</button>
-        </div>
-      </div>
-      <div class="game-container">
-        <div id="ticTacToeBoard">
-          <div class="cell" data-index="0" onclick="makeMove(0)"></div>
-          <div class="cell" data-index="1" onclick="makeMove(1)"></div>
-          <div class="cell" data-index="2" onclick="makeMove(2)"></div>
-          <div class="cell" data-index="3" onclick="makeMove(3)"></div>
-          <div class="cell" data-index="4" onclick="makeMove(4)"></div>
-          <div class="cell" data-index="5" onclick="makeMove(5)"></div>
-          <div class="cell" data-index="6" onclick="makeMove(6)"></div>
-          <div class="cell" data-index="7" onclick="makeMove(7)"></div>
-          <div class="cell" data-index="8" onclick="makeMove(8)"></div>
-        </div>
-        <div id="gameStatus">Current Player: X</div>
-        <button onclick="resetGame()">Reset Game</button>
-      </div>
-    </div>
+  // events
+  titlebar.addEventListener('pointerdown', startDrag);
+  closeBtn.onclick = () => { win.remove(); icon.remove(); delete windows[id]; };
+  minBtn.onclick = () => { win.style.display = 'none'; };
+  maxBtn.onclick = () => {
+    if(!win.dataset.max){
+      win.dataset.prev = JSON.stringify({left:win.style.left, top:win.style.top, width:win.style.width, height:win.style.height});
+      win.style.left = '8px'; win.style.top='8px'; win.style.width = (innerWidth-32)+'px'; win.style.height = (innerHeight-120)+'px';
+      win.dataset.max = '1';
+    } else {
+      const p = JSON.parse(win.dataset.prev); win.style.left=p.left; win.style.top=p.top; win.style.width=p.width; win.style.height=p.height;
+      delete win.dataset.max;
+    }
+  };
+  win.addEventListener('pointerdown', ()=>focusWindow(win));
 
-    <!-- CALENDAR APP (Functional) -->
-    <div id="calendarApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Calendar</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('calendarApp')">_</button>
-          <button onclick="maximizeWindow('calendarApp')">[ ]</button>
-          <button onclick="closeApp('calendarApp')">✕</button>
-        </div>
-      </div>
-      <div id="calendarContent" class="app-content"></div>
-    </div>
+  // resizer behavior
+  resizer.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const startX = e.clientX, startY = e.clientY;
+    const startW = win.offsetWidth, startH = win.offsetHeight;
+    const onMove = (ev) => {
+      win.style.width = Math.max(240, startW + (ev.clientX - startX)) + 'px';
+      win.style.height = Math.max(120, startH + (ev.clientY - startY)) + 'px';
+    };
+    const up = ()=>{window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', up);}
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', up);
+  });
 
-    <!-- WEATHER APP (Functional Widget) -->
-    <div id="weatherApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Weather</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('weatherApp')">_</button>
-          <button onclick="maximizeWindow('weatherApp')">[ ]</button>
-          <button onclick="closeApp('weatherApp')">✕</button>
-        </div>
-      </div>
-      <!-- Weather widget as provided -->
-      <div id="ww_8af2f39ec1bc1" v="1.3" loc="id" a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":[],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>
-        More forecasts: <a href="https://oneweather.org/fr/paris/30_jours/" id="ww_8af2f39ec1bc1_u" target="_blank">Météo 30 jours</a>
-      </div>
-      <script async src="https://app3.weatherwidget.org/js/?id=ww_8af2f39ec1bc1"></script>
-    </div>
+  function startDrag(e){
+    if(e.target.closest('.btn')) return;
+    const dragEl = win;
+    const sx = e.clientX, sy = e.clientY;
+    const l0 = dragEl.offsetLeft, t0 = dragEl.offsetTop;
+    dragEl.setPointerCapture(e.pointerId);
+    dragEl.classList.add('dragging');
+    const onMove = (ev) => {
+      dragEl.style.left = (l0 + ev.clientX - sx) + 'px';
+      dragEl.style.top = (t0 + ev.clientY - sy) + 'px';
+    };
+    const up = (ev) => {
+      dragEl.releasePointerCapture(e.pointerId);
+      dragEl.classList.remove('dragging');
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', up);
+  }
 
-    <!-- TASK MANAGER APP -->
-    <div id="taskManagerApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Task Manager</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('taskManagerApp')">_</button>
-          <button onclick="maximizeWindow('taskManagerApp')">[ ]</button>
-          <button onclick="closeApp('taskManagerApp')">✕</button>
-        </div>
-      </div>
-      <div id="runningApps" class="task-manager-list"></div>
-    </div>
+  focusWindow(win);
+  return {id, win, icon};
+}
 
-    <!-- SETTINGS APP -->
-    <div id="settingsApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>Settings</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('settingsApp')">_</button>
-          <button onclick="maximizeWindow('settingsApp')">[ ]</button>
-          <button onclick="closeApp('settingsApp')">✕</button>
-        </div>
+function focusWindow(win){
+  zIndexCounter++;
+  win.style.zIndex = zIndexCounter;
+}
+
+/* ========== Start Menu & Shortcuts ========== */
+startBtn.onclick = () => startMenu.style.display = startMenu.style.display === 'flex' ? 'none':'flex';
+document.querySelectorAll('[data-app]').forEach(b=>b.addEventListener('click', (ev)=>{
+  const app = b.dataset.app;
+  startMenu.style.display='none';
+  openApp(app);
+}));
+
+/* ========== Basic "Apps" ========== */
+async function openApp(name){
+  if(name === 'browser') {
+    createBrowserApp();
+  } else if(name === 'files'){
+    createFilesApp();
+  } else if(name === 'notes'){
+    createNotesApp();
+  } else if(name === 'term'){
+    createTermApp();
+  } else if(name === 'settings'){
+    createSettingsApp();
+  }
+}
+
+/* ========== Notes App ========== */
+function createNotesApp(){
+  createWindow({
+    title: 'Notes',
+    icon: '📝',
+    html: `<div style="display:flex;flex-direction:column;height:100%">
+      <textarea id="noteText" style="flex:1;width:100%;border-radius:8px;padding:8px;border:none;background:rgba(255,255,255,0.02);color:var(--text)"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="saveNote">Save</button>
+        <small id="noteStatus"></small>
       </div>
-      <div class="settings">
-        <h3>Theme & Wallpaper</h3>
-        <div class="theme-options">
-          <button onclick="setTheme('dark')">Dark</button>
-          <button onclick="setTheme('light')">Light</button>
-          <button onclick="setTheme('blue')">Blue</button>
-          <button onclick="setTheme('green')">Green</button>
-          <button onclick="setTheme('red')">Red</button>
-        </div>
-        <div class="wallpaper-options">
-          <p>Select Wallpaper:</p>
-          <img src="https://i.pinimg.com/736x/9d/88/87/9d888780ab67efcebb2bfc512b2fde6f.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
-          <img src="https://i.pinimg.com/736x/a6/cd/08/a6cd084dfe2b336947c33ae673430273.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
-          <img src="https://i.pinimg.com/736x/9a/29/f2/9a29f273b6b954623f43a551bd5b5511.jpg" class="wallpaper-option" onclick="changeWallpaper(this.src)">
-        </div>
-        <h3>Language</h3>
-        <select id="languageSelect" onchange="setLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
-        <h3>Accessibility</h3>
-        <button onclick="toggleHighContrast()">Toggle High Contrast</button>
-        <h3>App Management</h3>
-        <div id="appManagement">
-          <label><input type="checkbox" onchange="toggleApp('notesApp', this.checked)" checked> Notes</label>
-          <label><input type="checkbox" onchange="toggleApp('calculatorApp', this.checked)" checked> Calculator</label>
-          <label><input type="checkbox" onchange="toggleApp('terminalApp', this.checked)" checked> Terminal</label>
-          <label><input type="checkbox" onchange="toggleApp('browserApp', this.checked)" checked> Browser</label>
-          <label><input type="checkbox" onchange="toggleApp('fileManagerApp', this.checked)" checked> File Explorer</label>
-          <label><input type="checkbox" onchange="toggleApp('mediaPlayerApp', this.checked)" checked> Media Player</label>
-          <label><input type="checkbox" onchange="toggleApp('cameraApp', this.checked)" checked> Camera</label>
-          <label><input type="checkbox" onchange="toggleApp('gamesApp', this.checked)" checked> Games</label>
-          <label><input type="checkbox" onchange="toggleApp('taskManagerApp', this.checked)" checked> Task Manager</label>
-          <label><input type="checkbox" onchange="toggleApp('launchApp', this.checked)" checked> Launch</label>
-          <label><input type="checkbox" onchange="toggleApp('weatherApp', this.checked)" checked> Weather</label>
-          <label><input type="checkbox" onchange="toggleApp('calendarApp', this.checked)" checked> Calendar</label>
-          <label><input type="checkbox" onchange="toggleApp('todoApp', this.checked)" checked> To-Do</label>
-          <label><input type="checkbox" onchange="toggleApp('paintApp', this.checked)" checked> Paint</label>
-          <label><input type="checkbox" onchange="toggleApp('contactsApp', this.checked)" checked> Contacts</label>
-        </div>
-        <h3>User Profile</h3>
-        <input type="text" id="profileName" placeholder="Display Name">
-        <div class="avatar-selection">
-          <p>Select Profile Picture:</p>
-          <div class="avatar-options">
-            <img src="https://i.pinimg.com/736x/96/e4/82/96e48207b373600cea04807d51d20c4d.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
-            <img src="https://i.pinimg.com/736x/b9/55/29/b955295e61b78f8401ff7495a2af92a8.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
-            <img src="https://i.pinimg.com/736x/56/3c/ca/563ccacebffe196a92c5b59309262d39.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
-            <img src="https://i.pinimg.com/736x/49/9a/a6/499aa6a00ae605701bc11a7883a5be4e.jpg" class="avatar-option" onclick="selectAvatarFromSettings(this.src)">
-          </div>
-        </div>
-        <button onclick="saveProfile()">Save Profile</button>
+    </div>`,
+    width:'520px', height:'360px'
+  });
+  setTimeout(()=> {
+    const w = document.querySelector('.window[title="Notes"]') || document.querySelector('[data-id]'); // quick select
+    // load/save via IDBHelper
+    const ta = document.querySelector('#noteText');
+    const status = document.getElementById('noteStatus');
+    IDB.put('notes','default',{text:ta.value}).catch(()=>{});
+    IDB.get('notes','default').then(r => { if(r) ta.value = r.text; });
+    document.getElementById('saveNote').onclick = () => {
+      IDB.put('notes','default',{text:ta.value}).then(()=>status.textContent='Saved').catch(()=>status.textContent='Err');
+    }
+  }, 80);
+}
+
+/* ========== Terminal (fake) ========= */
+function createTermApp(){
+  createWindow({
+    title:'Terminal',
+    icon:'>_',
+    html:`<div style="display:flex;flex-direction:column;height:100%">
+      <div id="termOut" style="flex:1;overflow:auto;background:#051018;padding:10px;border-radius:8px;font-family:monospace"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="termIn" class="input" placeholder="type 'help'">
+        <button id="runCmd">Run</button>
+      </div>
+    </div>`,
+    width:'560px', height:'360px'
+  });
+  setTimeout(()=> {
+    const out = document.getElementById('termOut');
+    const inp = document.getElementById('termIn');
+    function writeln(s){ out.innerHTML += '<div>'+escapeHtml(s)+'</div>'; out.scrollTop = out.scrollHeight; }
+    writeln('WebOS Terminal v0.1');
+    writeln("Type 'help' for commands.");
+    document.getElementById('runCmd').onclick = run;
+    inp.onkeydown = (e)=>{ if(e.key==='Enter') run(); };
+    function run(){
+      const cmd = inp.value.trim(); inp.value='';
+      if(!cmd) return;
+      writeln('> '+cmd);
+      if(cmd === 'help') writeln("commands: help, echo, date, clear, listfiles");
+      else if(cmd.startsWith('echo ')) writeln(cmd.slice(5));
+      else if(cmd==='date') writeln(new Date().toString());
+      else if(cmd==='clear') out.innerHTML='';
+      else if(cmd==='listfiles') {
+        IDB.keys('files').then(keys => writeln('files: '+keys.join(',')));
+      } else writeln('unknown: '+cmd);
+    }
+  },80);
+}
+
+/* ========== Files App ========== */
+function createFilesApp(){
+  const idObj = createWindow({
+    title:'Files',
+    icon:'📁',
+    html:`<div style="display:flex;height:100%;gap:8px">
+      <div style="width:240px;padding:4px;border-right:1px solid rgba(255,255,255,0.02)">
+        <button id="newFile">New file</button>
+        <div id="fileList" style="margin-top:8px"></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:6px">
+        <input id="fileName" class="input" placeholder="filename.txt">
+        <textarea id="fileBody" style="flex:1;margin-top:6px;border-radius:8px;padding:8px;border:none;background:rgba(255,255,255,0.02);color:var(--text)"></textarea>
+        <div style="display:flex;gap:8px;margin-top:6px"><button id="saveFile">Save</button><small id="fileStatus"></small></div>
+      </div>
+    </div>`,
+    width:'760px', height:'460px'
+  });
+  setTimeout(refreshFileList, 100);
+
+  function refreshFileList(){
+    const list = document.getElementById('fileList');
+    list.innerHTML = '<small>Loading...</small>';
+    IDB.keys('files').then(keys=>{
+      list.innerHTML = '';
+      if(keys.length===0) list.innerHTML = '<small>(no files)</small>';
+      keys.forEach(k=>{
+        const el = document.createElement('div'); el.className='file';
+        el.innerHTML = `<div>${escapeHtml(k)}</div><div style="display:flex;gap:8px"><button data-open="${k}">Open</button><button data-del="${k}">Del</button></div>`;
+        list.appendChild(el);
+      });
+      list.querySelectorAll('[data-open]').forEach(b=>b.onclick = (e)=>{
+        const k = b.dataset.open;
+        IDB.get('files',k).then(v=>{
+          document.getElementById('fileName').value = k;
+          document.getElementById('fileBody').value = v.content || '';
+        });
+      });
+      list.querySelectorAll('[data-del]').forEach(b=>b.onclick = (e)=>{
+        const k = b.dataset.del;
+        IDB.del('files',k).then(()=>refreshFileList());
+      });
+    });
+  }
+
+  document.getElementById('newFile').onclick = ()=>{ document.getElementById('fileName').value = 'untitled.txt'; document.getElementById('fileBody').value = ''; };
+  document.getElementById('saveFile').onclick = ()=>{
+    const name = document.getElementById('fileName').value || 'untitled.txt';
+    const content = document.getElementById('fileBody').value || '';
+    IDB.put('files',name,{content}).then(()=>{ document.getElementById('fileStatus').textContent='Saved'; refreshFileList(); });
+  };
+}
+
+/* ========== Simple Settings App ========== */
+function createSettingsApp(){
+  createWindow({
+    title:'Settings',
+    icon:'⚙️',
+    html:`<div style="display:flex;flex-direction:column;gap:8px">
+      <label><input type="checkbox" id="darkToggle" checked> Dark mode</label>
+      <label>Wallpaper URL: <input id="wallUrl" class="input"></label>
+      <button id="applyWall">Apply</button>
+      <small>Theme & wallpaper saved to storage.</small>
+    </div>`,
+    width:'420px', height:'260px'
+  });
+  setTimeout(()=>{
+    const wallUrl = document.getElementById('wallUrl');
+    IDB.get('settings','wall').then(r=>{ if(r) wallUrl.value = r.url; });
+    document.getElementById('applyWall').onclick = ()=>{
+      IDB.put('settings','wall',{url:wallUrl.value}).then(()=>{
+        document.querySelector('.wallpaper').style.backgroundImage = `url(${wallUrl.value})`;
+      });
+    };
+  },60);
+}
+
+/* ========== Browser App ========== */
+function createBrowserApp(){
+  const html = `
+    <div style="display:flex;flex-direction:column;height:100%">
+      <div class="tabbar" id="tabs"></div>
+      <div class="browser-toolbar">
+        <button id="backBtn">◀</button>
+        <button id="fwdBtn">▶</button>
+        <input id="addr" class="input" placeholder="Enter URL (https://...)">
+        <button id="goBtn">Go</button>
+        <button id="newTab">＋</button>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div id="iframeWrap" style="flex:1;border-radius:8px;overflow:hidden;background:#000"></div>
       </div>
     </div>
+  `;
+  const {win} = createWindow({title:'Browser', icon:'🌐', html, width:'900px', height:'560px'});
+  setTimeout(()=>initBrowser(win),60);
+}
 
-    <!-- LAUNCH APP (shows extra apps not on primary nav bar) -->
-    <div id="launchApp" class="window" style="display: none;">
-      <div class="title-bar">
-        <span>All Apps</span>
-        <div class="window-controls">
-          <button onclick="minimizeWindow('launchApp')">_</button>
-          <button onclick="maximizeWindow('launchApp')">[ ]</button>
-          <button onclick="closeApp('launchApp')">✕</button>
-        </div>
-      </div>
-      <div class="launch-grid">
-        <button onclick="openApp('weatherApp')">☀ Weather</button>
-        <button onclick="openApp('calendarApp')">📅 Calendar</button>
-        <button onclick="openApp('todoApp')">📝 To-Do</button>
-        <button onclick="openApp('paintApp')">🎨 Paint</button>
-        <button onclick="openApp('contactsApp')">☎ Contacts</button>
-      </div>
-    </div>
+function initBrowser(win){
+  const tabsEl = win.querySelector('#tabs');
+  const addr = win.querySelector('#addr');
+  const iframeWrap = win.querySelector('#iframeWrap');
+  let tabs = [];
+  let current = null;
 
-    <!-- NOTIFICATIONS CONTAINER -->
-    <div id="notificationContainer"></div>
-  </div>
+  function newTab(url='data:text/html,<h2 style="font-family:Inter;color:#ddd;padding:18px">Welcome to the sandbox browser</h2>'){
+    const t = {id:'tab_'+Math.random().toString(36).slice(2,8), title:'new', url};
+    tabs.push(t);
+    renderTabs();
+    openTab(t.id);
+  }
+  function renderTabs(){
+    tabsEl.innerHTML = '';
+    tabs.forEach(t=>{
+      const btn = document.createElement('div'); btn.className='tab'; btn.textContent = t.title || t.url;
+      btn.dataset.id = t.id;
+      btn.onclick = ()=>openTab(t.id);
+      tabsEl.appendChild(btn);
+    });
+  }
+  function openTab(id){
+    const tab = tabs.find(x=>x.id===id);
+    if(!tab) return;
+    current = tab;
+    addr.value = tab.url;
+    iframeWrap.innerHTML = '';
+    // Use iframe sandbox. Cross-origin pages may refuse embedding.
+    const iframe = document.createElement('iframe');
+    iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='0';
+    // sandbox attributes — allow-scripts for interactive demo, but this is limited for cross-origin.
+    iframe.sandbox = "allow-same-origin allow-scripts allow-forms allow-popups";
+    try {
+      iframe.src = tab.url;
+    } catch(e){
+      iframe.src = 'data:text/plain,Error loading URL';
+    }
+    iframe.onload = () => {
+      tab.title = iframe.contentDocument?.title || tab.url;
+      renderTabs();
+    };
+    iframeWrap.appendChild(iframe);
+  }
 
-  <script src="script.js"></script>
+  win.querySelector('#goBtn').onclick = ()=>{
+    let u = addr.value.trim();
+    if(!u) return;
+    if(!u.match(/^https?:\/\//) && !u.startsWith('data:')) u = 'https://'+u;
+    if(current) { current.url = u; openTab(current.id); } else newTab(u);
+  };
+  win.querySelector('#newTab').onclick = ()=>newTab();
+  newTab();
+}
+
+/* ========== Small helpers & persistence (IndexedDB wrapper) ========== */
+const IDB = {
+  db:null,
+  open(){ return new Promise((res,rej)=>{
+    if(this.db) return res(this.db);
+    const r = indexedDB.open('webos_v1',1);
+    r.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('files')) db.createObjectStore('files');
+      if(!db.objectStoreNames.contains('notes')) db.createObjectStore('notes');
+      if(!db.objectStoreNames.contains('settings')) db.createObjectStore('settings');
+    };
+    r.onsuccess = e => { this.db = e.target.result; res(this.db); };
+    r.onerror = e => rej(e);
+  })},
+  put(store,key,val){ return this.open().then(db=> new Promise((res,rej)=>{
+    const t = db.transaction(store,'readwrite'); t.objectStore(store).put(val,key);
+    t.oncomplete = ()=>res(true); t.onerror = (e)=>rej(e);
+  }))},
+  get(store,key){ return this.open().then(db=> new Promise((res,rej)=>{
+    const t = db.transaction(store,'readonly'); const req = t.objectStore(store).get(key);
+    req.onsuccess = ()=>res(req.result);
+    req.onerror = (e)=>rej(e);
+  }))},
+  keys(store){ return this.open().then(db=> new Promise((res,rej)=>{
+    const t = db.transaction(store,'readonly'); const os = t.objectStore(store);
+    const items = []; const cursorReq = os.openCursor();
+    cursorReq.onsuccess = (e)=>{ const c = e.target.result; if(c){ items.push(c.key); c.continue(); } else res(items); };
+    cursorReq.onerror = (e)=>rej(e);
+  }))},
+  del(store,key){ return this.open().then(db=> new Promise((res,rej)=>{
+    const t = db.transaction(store,'readwrite'); t.objectStore(store).delete(key);
+    t.oncomplete = ()=>res(true); t.onerror = (e)=>rej(e);
+  }))}
+};
+
+/* escape helper */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ========== init & small UI bits ========== */
+(function init(){
+  // Clock
+  const clk = document.getElementById('clock');
+  function tick(){ clk.textContent = new Date().toLocaleTimeString(); }
+  tick(); setInterval(tick,1000);
+
+  // desktop shortcuts opening
+  document.querySelectorAll('#shortcuts [data-app]').forEach(b=>b.addEventListener('click', _=>openApp(b.dataset.app)));
+
+  // hide start menu on outside click
+  document.addEventListener('click', (e)=>{
+    if(!startMenu.contains(e.target) && e.target !== startBtn) startMenu.style.display = 'none';
+  });
+
+  // quick hands-on: open a browser and files on load for demo
+  createBrowserApp(); createFilesApp();
+})();
+
+/* ========== Keyboard shortcuts (basic) ========== */
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape') {
+    // hide all windows that are focused? quick demo: blur
+    document.activeElement.blur();
+  }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'n'){
+    e.preventDefault(); createWindow({title:'New Window', icon:'▣', html:'<div style="padding:12px">New window</div>'});
+  }
+});
+</script>
 </body>
 </html>
