@@ -1,484 +1,55 @@
-/* ---------- Import Google Font ---------- */
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
-
-/* ---------- Basic Reset ---------- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
 body {
-  font-family: 'Roboto', sans-serif;
-  transition: background 0.3s, color 0.3s;
+  margin: 0;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
   overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  color: #eaf2ff;
 }
-
-/* ---------- Theme Variables ---------- */
-:root {
-  --primary-color: #3498db;
-  --primary-hover: #2980b9;
-  --accent-color: #e74c3c;
-  --bg-light: #f5f5f5;
-  --bg-dark: #2c3e50;
-  --btn-text: #fff;
-}
-
-/* ---------- Themes ---------- */
-body.theme-dark {
-  background: var(--bg-dark);
-  color: #ecf0f1;
-}
-body.theme-light {
-  background: var(--bg-light);
-  color: #2c3e50;
-}
-body.theme-blue {
-  background: #d0e7ff;
-  color: #2c3e50;
-}
-body.theme-green {
-  background: #d0ffd6;
-  color: #2c3e50;
-}
-body.theme-red {
-  background: #ffd0d0;
-  color: #2c3e50;
-}
-
-/* ---------- Login Screen ---------- */
-#loginScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #34495e;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3000;
-}
-.login-container {
-  background: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  text-align: center;
-  width: 320px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.login-container h2 {
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-.login-container input {
-  width: 90%;
-  padding: 12px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  transition: border 0.3s;
-}
-.login-container input:focus {
-  border-color: var(--primary-color);
-}
-.login-buttons button {
-  width: 45%;
-  padding: 12px;
-  margin: 8px 5px;
-  border: none;
-  border-radius: 4px;
-  background: var(--primary-color);
-  color: var(--btn-text);
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.login-buttons button:hover {
-  background: var(--primary-hover);
-}
-
-/* ---------- Boot Screen ---------- */
-#bootScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #1a1a1a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 2500;
-  color: #fff;
-}
-.boot-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.loader {
-  width: 130px;
-  height: 130px;
-  border: 8px solid #ccc;
-  border-radius: 50%;
-  border-top: 8px solid var(--primary-color);
-  animation: spin 2s linear infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.loader img {
-  width: 65px;
-  height: 65px;
-  border-radius: 50%;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ---------- Main OS ---------- */
-#mainOS {
-  width: 100%;
-  height: 100%;
-}
-
-/* ---------- Taskbar ---------- */
-#taskbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(44, 62, 80, 0.95);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 15px;
-  z-index: 2000;
-}
-#taskbarIcons button,
-#minimizedWindows button {
-  background: var(--primary-color);
-  color: var(--btn-text);
-  border: none;
-  padding: 10px 14px;
-  margin: 0 4px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-}
-#taskbarIcons button:hover,
-#minimizedWindows button:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}
-#taskbarRight {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 15px;
-  color: #ecf0f1;
-}
-#navAvatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-}
-
-/* ---------- Windows ---------- */
-.window {
+#ui-overlay {
   position: absolute;
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  border-radius: 8px;
-  overflow: auto;
-  width: 360px;
-  resize: both;
-  transition: transform 0.2s;
-  padding-bottom: 30px;
-}
-.title-bar {
-  background: var(--primary-color);
-  color: #fff;
-  padding: 10px;
-  cursor: move;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-.window-controls button {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  margin-left: 6px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-.window-controls button:hover {
-  color: var(--accent-color);
-}
-.window textarea,
-.window input[type="text"] {
-  width: 92%;
-  padding: 10px;
-  margin: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 15px;
-}
-.app-buttons {
-  display: flex;
-  justify-content: space-around;
-  padding: 0 10px 12px;
-}
-.app-buttons button {
-  background: var(--primary-color);
-  color: var(--btn-text);
-  border: none;
-  padding: 10px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.app-buttons button:hover {
-  background: var(--primary-hover);
-}
-
-/* ---------- Calculator ---------- */
-.calc-buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 10px;
-}
-.calc-buttons button {
-  background: #2ecc71;
-  color: #fff;
-  border: none;
-  padding: 14px;
-  font-size: 18px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.calc-buttons button:hover {
-  background: #27ae60;
-}
-
-/* ---------- Terminal ---------- */
-.terminal-output {
-  background: #000;
-  color: #0f0;
-  font-family: monospace;
-  height: 160px;
-  overflow-y: auto;
-  padding: 12px;
-  margin: 12px;
-  border-radius: 4px;
-}
-
-/* ---------- Browser ---------- */
-.browser-controls {
-  padding: 8px;
-  display: flex;
-  gap: 8px;
-}
-.browser-controls input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-#iframe, iframe {
-  width: 100%;
-  height: 420px;
-}
-
-/* ---------- File Manager ---------- */
-.file-manager {
-  padding: 12px;
-}
-.file-manager button {
-  background: var(--primary-color);
-  color: var(--btn-text);
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: background 0.3s;
-}
-.file-manager button:hover {
-  background: var(--primary-hover);
-}
-.file-manager ul {
-  list-style: none;
-  max-height: 120px;
-  overflow-y: auto;
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.file-manager ul li {
-  padding: 6px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-}
-.file-manager ul li:hover {
-  background: #f0f0f0;
-}
-
-/* ---------- Media Player ---------- */
-.media-player {
-  padding: 12px;
-}
-.media-player input {
-  width: 70%;
-  padding: 8px;
-  margin: 6px 4px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 15px;
-}
-.media-player button {
-  background: var(--primary-color);
-  color: var(--btn-text);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.media-player button:hover {
-  background: var(--primary-hover);
-}
-
-/* ---------- Camera ---------- */
-#cameraApp video {
-  width: 100%;
-  height: auto;
-}
-
-/* ---------- Games (Tic Tac Toe) ---------- */
-.game-container {
-  padding: 12px;
+  top: 36px;
+  left: 0; right: 0;
+  width: 100vw;
   text-align: center;
-}
-#ticTacToeBoard {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  margin: 12px auto;
-  width: 180px;
-  height: 180px;
-}
-#ticTacToeBoard .cell {
-  background: #ecf0f1;
-  border: 1px solid #ccc;
-  font-size: 2em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  z-index: 10;
+  color: #eaf2ffcc;
+  backdrop-filter: blur(10px) saturate(170%);
+  -webkit-backdrop-filter: blur(10px) saturate(170%);
+  border-radius: 32px;
+  background: rgba(31, 27, 56, 0.35);
+  border: 1.5px solid rgba(255,255,255,0.13);
+  box-shadow: 0 4px 32px rgba(18,28,58,0.18);
+  padding: 12px 30px 24px 30px;
   user-select: none;
-  transition: background 0.3s;
 }
-#ticTacToeBoard .cell:hover {
-  background: #bdc3c7;
+h1 {
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: .04em;
+  margin: 8px 0 10px 0;
+  background: linear-gradient(92deg, #6be3ff 0%, #db28e2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-#gameStatus {
-  margin: 12px;
-  font-size: 1.2em;
+.desc {
+  font-size: 1.18em;
+  opacity: 0.82;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 400;
 }
-
-/* ---------- Calendar ---------- */
-#calendarContent {
-  padding: 12px;
-  font-size: 15px;
+#galaxy-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0; left: 0;
 }
-
-/* ---------- To-Do, Paint, Contacts, etc. ---------- */
-.app-content {
-  padding: 12px;
+::-webkit-scrollbar {
+  width: 8px;
+  background: rgba(32,34,54,0.18);
 }
-
-/* ---------- Settings ---------- */
-.settings {
-  padding: 12px;
-}
-.settings h3 {
-  margin: 10px 0;
-}
-.settings button,
-.settings select,
-.settings input[type="text"] {
-  padding: 8px;
-  margin: 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  transition: border 0.3s;
-}
-.settings button:hover {
-  background: var(--primary-color);
-  color: var(--btn-text);
-}
-.avatar-options img, .wallpaper-options img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin: 4px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.3s;
-}
-.avatar-options img:hover, .wallpaper-options img:hover {
-  border: 2px solid var(--primary-color);
-}
-.wallpaper-options img {
-  border-radius: 4px;
-}
-
-/* ---------- Launch Grid ---------- */
-.launch-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 12px;
-}
-
-/* ---------- Task Manager ---------- */
-.task-manager-list {
-  padding: 12px;
-  background: #fafafa;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.task-manager-list div {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-.task-manager-list div:last-child {
-  border-bottom: none;
-/* ---------- contrast settings ---------- */  
-}
-body.high-contrast {
-  background: #000;
-  color: #fff;
-}
-body.high-contrast .title-bar {
-  background: #000;
-  color: #fff;
-  border-bottom: 1px solid #fff;
-}
-body.high-contrast button {
-  background: #fff;
-  color: #000;
-  border: 1px solid #000;
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(120deg, #19a1f7 0%, #db28e2 100%);
+  border-radius: 99px;
 }
